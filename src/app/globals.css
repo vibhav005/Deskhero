@@ -1,0 +1,180 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* DeskHero — premium game-dashboard palette. Dark by default: deep teal-charcoal
+     surfaces with a luminous teal primary + warm apricot accent built for glow. */
+  --background: 200 22% 6%;
+  --foreground: 60 15% 95%;
+  --surface: 200 20% 9%;
+
+  --card: 200 19% 11%;
+  --card-foreground: 60 15% 95%;
+
+  --primary: 168 72% 46%; /* luminous teal — reads well as a glow on dark */
+  --primary-foreground: 200 30% 7%;
+  --primary-soft: 168 40% 16%;
+
+  --accent: 20 92% 66%; /* warm apricot highlight */
+  --accent-foreground: 20 40% 10%;
+  --accent-soft: 20 55% 15%;
+
+  --muted: 200 14% 15%;
+  --muted-foreground: 200 10% 66%;
+
+  --success: 150 60% 48%;
+  --success-foreground: 150 40% 7%;
+  --success-soft: 150 45% 14%;
+
+  --warning: 38 90% 58%;
+  --warning-foreground: 38 45% 8%;
+  --warning-soft: 38 45% 15%;
+
+  /* Achievement rarity tiers */
+  --tier-bronze: 25 55% 52%;
+  --tier-silver: 210 14% 72%;
+  --tier-gold: 45 92% 58%;
+
+  --border: 200 15% 19%;
+  --input: 200 15% 19%;
+  --ring: 168 72% 46%;
+
+  --radius: 0.875rem;
+
+  /* Confident, slightly rounded system font stack — no network fonts required. */
+  --font-sans: "SF Pro Rounded", ui-rounded, "Nunito", "Segoe UI", system-ui,
+    -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Optional light appearance, toggled from Profile > Appearance */
+.light {
+  --background: 60 20% 98%;
+  --foreground: 175 25% 12%;
+  --surface: 0 0% 100%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 175 25% 12%;
+
+  --primary: 172 66% 40%;
+  --primary-foreground: 0 0% 100%;
+  --primary-soft: 172 55% 92%;
+
+  --accent: 18 92% 68%;
+  --accent-foreground: 20 40% 18%;
+  --accent-soft: 20 90% 94%;
+
+  --muted: 170 12% 95%;
+  --muted-foreground: 175 10% 40%;
+
+  --success: 150 55% 42%;
+  --success-foreground: 0 0% 100%;
+  --success-soft: 150 55% 93%;
+
+  --warning: 38 92% 55%;
+  --warning-foreground: 0 0% 100%;
+  --warning-soft: 38 90% 94%;
+
+  --tier-bronze: 25 60% 42%;
+  --tier-silver: 210 10% 55%;
+  --tier-gold: 42 80% 45%;
+
+  --border: 170 14% 90%;
+  --input: 170 14% 90%;
+  --ring: 172 66% 40%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-feature-settings: "cv11", "ss01";
+  text-rendering: optimizeLegibility;
+}
+
+/* Accessible focus ring for keyboard users */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+/* Respect user reduced-motion at the OS level. The in-app toggle adds .reduce-motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+
+/* Thin, calm scrollbars */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Subtle top-light sheen for panels — reads as glass/depth on dark surfaces. */
+.panel-sheen {
+  position: relative;
+  isolation: isolate;
+}
+.panel-sheen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(180deg, hsl(var(--foreground) / 0.05), transparent 45%);
+  pointer-events: none;
+}
+
+/* Achievement rarity — metallic border + soft glow, tier set via data attribute. */
+[data-tier="bronze"] {
+  --tier-color: hsl(var(--tier-bronze));
+}
+[data-tier="silver"] {
+  --tier-color: hsl(var(--tier-silver));
+}
+[data-tier="gold"] {
+  --tier-color: hsl(var(--tier-gold));
+}
+.tier-glow {
+  border-color: var(--tier-color) !important;
+  box-shadow:
+    0 0 0 1px color-mix(in hsl, var(--tier-color) 40%, transparent),
+    0 8px 24px color-mix(in hsl, var(--tier-color) 30%, transparent);
+}
