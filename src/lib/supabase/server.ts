@@ -32,6 +32,14 @@ export async function createClient() {
           }
         },
       },
+      global: {
+        // Without this, Next's automatic fetch memoization can return a
+        // stale response for an identical query issued twice in the same
+        // request (e.g. re-reading a row right after inserting it) — every
+        // Supabase read here is per-user, per-request data that must never
+        // be cached across requests either.
+        fetch: (input, init) => fetch(input, { ...init, cache: "no-store" }),
+      },
     },
   );
 }

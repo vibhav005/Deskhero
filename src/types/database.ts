@@ -1242,6 +1242,19 @@ export type Database = {
         }[]
       }
       evaluate_achievements: { Args: { p_user_id: string }; Returns: undefined }
+      get_my_stats: {
+        Args: never
+        Returns: {
+          best_streak: number
+          days_active: number
+          hydration_completed: number
+          mobility_completed: number
+          posture_completed: number
+          quests_completed: number
+          walks_completed: number
+          workouts_completed: number
+        }[]
+      }
       is_admin: { Args: never; Returns: boolean }
       is_challenge_member: {
         Args: { p_challenge_id: string }
