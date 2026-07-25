@@ -1,12 +1,19 @@
 "use client";
 
 import { motion } from "framer-motion";
-import type { DayRecord } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import { todayKey, cn } from "@/lib/utils";
 
+/** Only the fields this component actually reads — deliberately looser than
+ * the legacy DayRecord type so any day-record-shaped data source works. */
+interface HistoryDay {
+  date: string;
+  completedQuestIds: unknown[];
+  assigned: number;
+}
+
 interface StreakCalendarProps {
-  history: DayRecord[];
+  history: HistoryDay[];
   todayAssigned: number;
   todayCompleted: number;
   weeks?: number;
@@ -33,7 +40,7 @@ function levelFor(ratio: number): 0 | 1 | 2 | 3 | 4 {
 
 /** Build a GitHub-style grid of week columns, padded so the first column starts on Sunday. */
 function buildWeeks(
-  history: DayRecord[],
+  history: HistoryDay[],
   todayAssigned: number,
   todayCompleted: number,
   weeks: number,

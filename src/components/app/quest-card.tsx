@@ -1,27 +1,28 @@
 import Link from "next/link";
 import { Clock, Zap } from "lucide-react";
-import type { Quest } from "@/lib/types";
+import type { Database } from "@/types/database";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 import { categoryIcon, CATEGORY_LABEL } from "@/components/app/icon";
 import { cn } from "@/lib/utils";
 
-const DIFFICULTY_LABEL: Record<Quest["difficulty"], string> = {
+type Activity = Database["public"]["Tables"]["activities"]["Row"];
+
+const DIFFICULTY_LABEL: Record<Activity["difficulty"], string> = {
   easy: "Easy",
   moderate: "Moderate",
   challenging: "Challenging",
 };
 
-const DIFFICULTY_TONE: Record<Quest["difficulty"], "success" | "warning" | "accent"> =
-  {
-    easy: "success",
-    moderate: "warning",
-    challenging: "accent",
-  };
+const DIFFICULTY_TONE: Record<Activity["difficulty"], "success" | "warning" | "accent"> = {
+  easy: "success",
+  moderate: "warning",
+  challenging: "accent",
+};
 
-export function QuestCard({ quest }: { quest: Quest }) {
-  const Icon = categoryIcon(quest.category);
+export function QuestCard({ quest }: { quest: Activity }) {
+  const Icon = categoryIcon(quest.category as never);
   return (
     <Card className="flex flex-col p-4">
       <div className="flex items-start gap-3">
@@ -31,7 +32,7 @@ export function QuestCard({ quest }: { quest: Quest }) {
         <div className="min-w-0 flex-1">
           <h3 className="font-semibold leading-snug">{quest.title}</h3>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {CATEGORY_LABEL[quest.category]}
+            {CATEGORY_LABEL[quest.category as never]}
           </p>
         </div>
       </div>
@@ -44,7 +45,7 @@ export function QuestCard({ quest }: { quest: Quest }) {
           {DIFFICULTY_LABEL[quest.difficulty]}
         </Badge>
         <Badge variant="default">
-          <Zap className="h-3 w-3" aria-hidden /> {quest.xp} XP
+          <Zap className="h-3 w-3" aria-hidden /> {quest.xp_value} XP
         </Badge>
         {quest.position !== "either" && (
           <Badge variant="outline">
@@ -54,7 +55,7 @@ export function QuestCard({ quest }: { quest: Quest }) {
       </div>
 
       <Link
-        href={`/quests/${quest.id}`}
+        href={`/quests/${quest.slug}`}
         className={cn(buttonVariants({ size: "sm" }), "mt-4 w-full")}
       >
         Start
