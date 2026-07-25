@@ -64,3 +64,35 @@ export async function getActivityDetail(slug: string): Promise<ActivityDetail | 
     status: (dailyQuest?.status as ActivityDetail["status"]) ?? null,
   };
 }
+
+export interface WorkoutStepRow {
+  position: number;
+  seconds: number | null;
+  reps: number | null;
+  exercise: {
+    name: string;
+    instruction: string;
+    easier_variant: string | null;
+    icon: string | null;
+  };
+}
+
+/** The ordered exercise steps for a guided workout, given the workout's id. */
+export async function getWorkoutSteps(workoutId: string): Promise<WorkoutStepRow[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("workout_exercises")
+    .select("position, seconds, reps, exercises(name, instruction, easier_variant, icon)")
+    .eq("workout_id", workoutId)
+    .order("position");
+
+  return (data ?? []).map((row) => {
+    const exercise = Array.isArray(row.exercises) ? row.exercises[0] : row.exercises;
+    return {
+      position: row.position,
+      seconds: row.seconds,
+      reps: row.reps,
+      exercise: exercise ?? { name: "Exercise", instruction: "", easier_variant: null, icon: null },
+    };
+  });
+}
