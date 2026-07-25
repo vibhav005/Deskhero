@@ -1260,6 +1260,7 @@ export type Database = {
         Args: { p_challenge_id: string }
         Returns: boolean
       }
+      log_reminder_sent: { Args: { p_message: string }; Returns: undefined }
       process_daily_streaks: { Args: never; Returns: undefined }
     }
     Enums: {
