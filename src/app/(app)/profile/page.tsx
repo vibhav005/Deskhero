@@ -22,6 +22,7 @@ import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { PixelHero } from "@/components/app/pixel-hero";
+import { ReminderSettings } from "@/components/app/reminder-settings";
 import { cn } from "@/lib/utils";
 import type {
   Goal,
@@ -253,6 +254,9 @@ export default function ProfilePage() {
           />
         </SettingRow>
       </Card>
+
+      {/* Reminders */}
+      <ReminderSettings />
 
       {/* Health & safety */}
       <Card className="p-5">

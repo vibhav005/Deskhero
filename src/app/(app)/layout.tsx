@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getLegacyBridgeProfile } from "@/lib/queries/legacy-bridge";
 import { LegacyStoreBridge } from "@/components/app/legacy-store-bridge";
+import { ReminderHeartbeat } from "@/components/app/reminder-heartbeat";
 import { Sidebar } from "@/components/nav/sidebar";
 import { BottomNav } from "@/components/nav/bottom-nav";
 
@@ -33,6 +34,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-6xl">
+      <ReminderHeartbeat />
       <Sidebar />
       <div className="flex-1">
         <main
