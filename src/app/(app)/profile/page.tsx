@@ -5,12 +5,14 @@ import { useState } from "react";
 import {
   HeartPulse,
   Lock,
+  LogOut,
   RefreshCw,
   Shield,
   Snowflake,
   Volume2,
   Sparkles,
 } from "lucide-react";
+import { signOut } from "@/lib/actions/auth";
 import { useStore } from "@/lib/store";
 import { levelForXp } from "@/lib/logic";
 import { nextGearUnlock } from "@/lib/pixel-hero";
@@ -272,10 +274,26 @@ export default function ProfilePage() {
         <div>
           <p className="font-semibold">Privacy</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Your prototype data is stored only in this browser. Nothing is sent to
-            any server, and there are no accounts or tracking.
+            Your account and progress are stored securely and only used to run
+            DeskHero. We never sell your data or show you ads.
           </p>
         </div>
+      </Card>
+
+      {/* Account */}
+      <Card className="p-5">
+        <div className="flex items-center gap-2">
+          <LogOut className="h-5 w-5 text-muted-foreground" aria-hidden />
+          <h2 className="font-semibold">Account</h2>
+        </div>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Signed in. Signing out ends your session on this device.
+        </p>
+        <form action={signOut}>
+          <Button type="submit" variant="outline" className="mt-4 w-full">
+            Sign out
+          </Button>
+        </form>
       </Card>
 
       {/* Reset */}

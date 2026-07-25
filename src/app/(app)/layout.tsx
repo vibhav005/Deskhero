@@ -1,36 +1,35 @@
-"use client";
-
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { useStore } from "@/lib/store";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { getLegacyBridgeProfile } from "@/lib/queries/legacy-bridge";
+import { LegacyStoreBridge } from "@/components/app/legacy-store-bridge";
 import { Sidebar } from "@/components/nav/sidebar";
 import { BottomNav } from "@/components/nav/bottom-nav";
-import { LogoMark } from "@/components/app/logo";
 
 /**
- * Shared shell for the signed-in prototype experience.
- * Redirects to onboarding if the user hasn't set up a profile yet.
+ * Shared shell for the signed-in experience. A real Server Component gate:
+ * redirects to /auth/login if there's no session (defense in depth —
+ * middleware already blocks this), to /auth/verify-email if the email isn't
+ * confirmed yet, and to /onboarding if onboarding_completed_at is still null.
+ * Can't be bypassed by disabling JS, and there's no client-side redirect flash.
  */
-export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { state, ready } = useStore();
-  const router = useRouter();
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  useEffect(() => {
-    if (ready && !state.onboarded) {
-      router.replace("/");
-    }
-  }, [ready, state.onboarded, router]);
+  if (!user) redirect("/auth/login");
+  if (!user.email_confirmed_at) redirect("/auth/verify-email");
 
-  if (!ready || !state.onboarded) {
-    return (
-      <div className="grid min-h-dvh place-items-center bg-background">
-        <div className="flex flex-col items-center gap-3 text-muted-foreground">
-          <LogoMark className="h-12 w-12 animate-pop" />
-          <p className="text-sm">Loading your quests…</p>
-        </div>
-      </div>
-    );
-  }
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("onboarding_completed_at")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile?.onboarding_completed_at) redirect("/onboarding");
+
+  const legacyProfile = await getLegacyBridgeProfile();
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-6xl">
@@ -40,7 +39,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           id="main"
           className="mx-auto w-full max-w-2xl px-4 pb-28 pt-6 md:max-w-3xl md:px-8 md:pb-12"
         >
-          {children}
+          {legacyProfile ? (
+            <LegacyStoreBridge profile={legacyProfile}>{children}</LegacyStoreBridge>
+          ) : (
+            children
+          )}
         </main>
       </div>
       <BottomNav />

@@ -6,6 +6,7 @@ import {
   Droplet,
   Dumbbell,
   Eye,
+  Flame,
   Footprints,
   Heart,
   Map,
@@ -16,6 +17,7 @@ import {
   RotateCw,
   Shield,
   Sparkles,
+  Trophy,
   Wind,
   type LucideIcon,
 } from "lucide-react";
@@ -29,6 +31,7 @@ const ICONS: Record<string, LucideIcon> = {
   droplet: Droplet,
   dumbbell: Dumbbell,
   eye: Eye,
+  flame: Flame,
   footprints: Footprints,
   heart: Heart,
   map: Map,
@@ -39,6 +42,7 @@ const ICONS: Record<string, LucideIcon> = {
   "rotate-cw": RotateCw,
   shield: Shield,
   sparkles: Sparkles,
+  trophy: Trophy,
   wind: Wind,
 };
 
