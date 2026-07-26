@@ -1310,6 +1310,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      reset_my_progress: { Args: never; Returns: undefined }
       search_profiles_admin: {
         Args: { p_query: string }
         Returns: {
