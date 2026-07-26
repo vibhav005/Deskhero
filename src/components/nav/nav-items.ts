@@ -5,6 +5,7 @@ import {
   LineChart,
   Timer,
   User,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 
@@ -22,5 +23,6 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/work-mode", label: "Work Mode", icon: Timer, primary: true },
   { href: "/progress", label: "Progress", icon: LineChart, primary: true },
   { href: "/achievements", label: "Badges", icon: Award, primary: false },
+  { href: "/challenges", label: "Challenges", icon: Users, primary: false },
   { href: "/profile", label: "Profile", icon: User, primary: true },
 ];

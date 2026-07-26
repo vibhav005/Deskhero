@@ -1242,6 +1242,25 @@ export type Database = {
         }[]
       }
       evaluate_achievements: { Args: { p_user_id: string }; Returns: undefined }
+      get_challenge_leaderboard: {
+        Args: { p_challenge_id: string }
+        Returns: {
+          contribution_count: number
+          contribution_points: number
+          display_name: string
+          user_id: string
+        }[]
+      }
+      get_challenge_members: {
+        Args: { p_challenge_id: string }
+        Returns: {
+          display_name: string
+          joined_at: string
+          left_at: string
+          role: string
+          user_id: string
+        }[]
+      }
       get_my_stats: {
         Args: never
         Returns: {
@@ -1260,8 +1279,21 @@ export type Database = {
         Args: { p_challenge_id: string }
         Returns: boolean
       }
+      join_challenge_by_code: {
+        Args: { p_invite_code: string }
+        Returns: string
+      }
       log_reminder_sent: { Args: { p_message: string }; Returns: undefined }
       process_daily_streaks: { Args: never; Returns: undefined }
+      record_challenge_contributions: {
+        Args: {
+          p_points: number
+          p_source_id: string
+          p_source_type: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
