@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { trackEvent } from "@/lib/actions/analytics";
 import {
   challengeIdSchema,
   createChallengeSchema,
@@ -91,6 +92,7 @@ export async function joinChallengeByCode(input: JoinByCodeInput): Promise<Actio
   if (error) return { ok: false, message: error.message };
 
   revalidatePath("/challenges");
+  await trackEvent("challenge_joined", { challengeId: data ?? undefined, via: "invite_code" });
   return { ok: true, challengeId: data ?? undefined };
 }
 
@@ -131,6 +133,7 @@ export async function joinPublicChallenge(input: ChallengeIdInput): Promise<Acti
 
   revalidatePath(`/challenges/${parsed.data.challengeId}`);
   revalidatePath("/challenges");
+  await trackEvent("challenge_joined", { challengeId: parsed.data.challengeId, via: "public" });
   return { ok: true, challengeId: parsed.data.challengeId };
 }
 
@@ -153,6 +156,7 @@ export async function leaveChallenge(input: ChallengeIdInput): Promise<ActionRes
 
   revalidatePath(`/challenges/${parsed.data.challengeId}`);
   revalidatePath("/challenges");
+  await trackEvent("challenge_left", { challengeId: parsed.data.challengeId });
   return { ok: true };
 }
 
@@ -177,6 +181,7 @@ export async function reportChallenge(input: ReportChallengeInput): Promise<Acti
   });
   if (error) return { ok: false, message: error.message };
 
+  await trackEvent("feedback_submitted", { category: "general", targetType: "challenge" });
   return { ok: true, message: "Thanks — the team will take a look." };
 }
 
