@@ -18,13 +18,22 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm ci
+        # npm install rather than npm ci: platform/Node-version-gated optional
+        # dependencies (e.g. @emnapi/*) have repeatedly caused package-lock.json
+        # to drift between local (Windows, newer Node) and CI (Ubuntu, Node 22)
+        # even right after a clean `npm install` — npm ci's strict lockfile
+        # match then fails on dependencies npm itself just wrote. npm install
+        # tolerates that drift instead of hard-failing on it.
+        run: npm install
 
       - name: Lint
         run: npm run lint
 
       - name: Type check
         run: npx tsc --noEmit
+
+      - name: Unit tests
+        run: npm test
 
       - name: Build
         run: npm run build
