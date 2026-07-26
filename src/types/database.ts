@@ -1209,6 +1209,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_adjust_xp: {
+        Args: { p_reason: string; p_user_id: string; p_xp_amount: number }
+        Returns: undefined
+      }
       award_xp: {
         Args: {
           p_idempotency_key: string
@@ -1242,6 +1246,18 @@ export type Database = {
         }[]
       }
       evaluate_achievements: { Args: { p_user_id: string }; Returns: undefined }
+      get_admin_dashboard_stats: {
+        Args: never
+        Returns: {
+          active_challenges: number
+          active_users_7d: number
+          open_feedback: number
+          total_quest_completions: number
+          total_users: number
+          total_workouts_completed: number
+          total_xp_awarded: number
+        }[]
+      }
       get_challenge_leaderboard: {
         Args: { p_challenge_id: string }
         Returns: {
@@ -1293,6 +1309,15 @@ export type Database = {
           p_user_id: string
         }
         Returns: undefined
+      }
+      search_profiles_admin: {
+        Args: { p_query: string }
+        Returns: {
+          current_level: number
+          current_xp: number
+          display_name: string
+          user_id: string
+        }[]
       }
     }
     Enums: {

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { trackEvent } from "@/lib/actions/analytics";
 import { todayInTimezone, currentHourInTimezone } from "@/lib/tz";
 import {
   completeQuestSchema,
@@ -342,6 +343,7 @@ export async function generateDailyPlan(
       .eq("id", existingPlan.id);
 
     revalidatePath("/dashboard");
+    await trackEvent("make_today_easier_used");
     return { ok: true };
   }
 
@@ -381,6 +383,7 @@ export async function generateDailyPlan(
   if (questsError) return { ok: false, message: questsError.message };
 
   revalidatePath("/dashboard");
+  await trackEvent(options.easier ? "make_today_easier_used" : "daily_plan_generated");
   return { ok: true };
 }
 
@@ -416,6 +419,7 @@ export async function completeQuest(input: CompleteQuestInput): Promise<ActionRe
   revalidatePath("/dashboard");
   revalidatePath("/achievements");
   revalidatePath("/progress");
+  await trackEvent("quest_completed", { dailyQuestId: parsed.data.dailyQuestId });
   return { ok: true };
 }
 
@@ -438,6 +442,7 @@ export async function skipQuest(input: DailyQuestIdInput): Promise<ActionResult>
   if (error) return { ok: false, message: error.message };
 
   revalidatePath("/dashboard");
+  await trackEvent("quest_skipped", { dailyQuestId: parsed.data.dailyQuestId });
   return { ok: true };
 }
 
@@ -496,5 +501,6 @@ export async function replaceQuest(input: DailyQuestIdInput): Promise<ActionResu
   if (error) return { ok: false, message: error.message };
 
   revalidatePath("/dashboard");
+  await trackEvent("quest_replaced", { dailyQuestId: parsed.data.dailyQuestId });
   return { ok: true };
 }

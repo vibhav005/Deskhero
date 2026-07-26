@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { trackEvent } from "@/lib/actions/analytics";
 import { todayInTimezone, currentHourInTimezone } from "@/lib/tz";
 import {
   snoozeSchema,
@@ -80,6 +81,7 @@ export async function snoozeReminders(input: SnoozeInput): Promise<ActionResult>
     .upsert({ user_id: user.id, snooze_until: snoozeUntil }, { onConflict: "user_id" });
   if (error) return { ok: false, message: error.message };
 
+  await trackEvent("reminder_snoozed", { hours: parsed.data.hours });
   return { ok: true };
 }
 
