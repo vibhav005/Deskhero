@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { trackEvent } from "@/lib/actions/analytics";
 import {
   completeOnboardingSchema,
   onboardingStepSchema,
@@ -100,6 +101,8 @@ export async function completeOnboarding(
     .eq("id", user.id);
 
   if (error) return { ok: false, message: error.message };
+
+  await trackEvent("onboarding_completed");
 
   // (app)/layout.tsx's onboarding-gate check is cached per route by Next's
   // router cache — without this, a client-side push to /dashboard right

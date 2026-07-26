@@ -23,6 +23,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { PixelHero } from "@/components/app/pixel-hero";
 import { ReminderSettings } from "@/components/app/reminder-settings";
+import { AnalyticsConsentToggle } from "@/components/app/analytics-consent-toggle";
 import { cn } from "@/lib/utils";
 import type {
   Goal,
@@ -253,6 +254,7 @@ export default function ProfilePage() {
             label="Toggle reduced motion"
           />
         </SettingRow>
+        <AnalyticsConsentToggle />
       </Card>
 
       {/* Reminders */}

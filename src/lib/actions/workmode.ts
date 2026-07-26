@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { trackEvent } from "@/lib/actions/analytics";
 import {
   completeBreakSchema,
   startWorkSessionSchema,
@@ -36,6 +37,7 @@ export async function startWorkSession(input: StartWorkSessionInput): Promise<Ac
     .single();
   if (error || !data) return { ok: false, message: error?.message ?? "Could not start session." };
 
+  await trackEvent("work_session_started", { plannedMinutes: parsed.data.plannedMinutes });
   return { ok: true, sessionId: data.id };
 }
 
@@ -67,6 +69,7 @@ export async function completeBreak(input: CompleteBreakInput): Promise<ActionRe
   revalidatePath("/dashboard");
   revalidatePath("/achievements");
   revalidatePath("/progress");
+  await trackEvent("work_session_completed", { workSessionId: parsed.data.workSessionId });
   return { ok: true };
 }
 

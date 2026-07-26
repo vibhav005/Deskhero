@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { trackEvent } from "@/lib/actions/analytics";
 import {
   magicLinkSchema,
   requestPasswordResetSchema,
@@ -37,6 +38,7 @@ export async function signUp(_prev: ActionResult, formData: FormData): Promise<A
   });
 
   if (error) return { ok: false, message: error.message };
+  await trackEvent("signup_completed");
   revalidatePath("/", "layout");
   redirect("/auth/verify-email");
 }
