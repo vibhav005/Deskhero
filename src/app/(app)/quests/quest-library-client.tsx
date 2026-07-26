@@ -111,12 +111,15 @@ export function QuestLibraryClient({ activities }: { activities: Activity[] }) {
         </FilterRow>
       </div>
 
+      <h2 id="results-heading" className="sr-only">
+        Results
+      </h2>
       <p className="text-sm text-muted-foreground" aria-live="polite">
         {filtered.length} quest{filtered.length === 1 ? "" : "s"}
       </p>
 
       {filtered.length > 0 ? (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2" aria-labelledby="results-heading">
           {filtered.map((quest) => (
             <QuestCard key={quest.id} quest={quest} />
           ))}
