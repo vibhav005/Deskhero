@@ -1,12 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import {
   HeartPulse,
   Lock,
   LogOut,
-  RefreshCw,
   Shield,
   Snowflake,
   Volume2,
@@ -24,6 +21,9 @@ import { Badge } from "@/components/ui/badge";
 import { PixelHero } from "@/components/app/pixel-hero";
 import { ReminderSettings } from "@/components/app/reminder-settings";
 import { AnalyticsConsentToggle } from "@/components/app/analytics-consent-toggle";
+import { FeedbackForm } from "@/components/app/feedback-form";
+import { DataPrivacyPanel } from "@/components/app/data-privacy-panel";
+import { DeleteAccountPanel } from "@/components/app/delete-account-panel";
 import { cn } from "@/lib/utils";
 import type {
   Goal,
@@ -50,12 +50,10 @@ const REMINDERS: { value: ReminderPreference; label: string }[] = [
 ];
 
 export default function ProfilePage() {
-  const router = useRouter();
   const {
     state,
     updateProfile,
     updateSettings,
-    resetDemo,
     useStreakFreeze,
     regenerateToday,
     setXp,
@@ -63,12 +61,6 @@ export default function ProfilePage() {
   const profile = state.profile!;
   const level = levelForXp(state.xp);
   const nextGear = nextGearUnlock(level.level);
-  const [confirmReset, setConfirmReset] = useState(false);
-
-  function handleReset() {
-    resetDemo();
-    router.push("/");
-  }
 
   function changeGoal(goal: Goal) {
     updateProfile({ goal });
@@ -302,39 +294,14 @@ export default function ProfilePage() {
         </form>
       </Card>
 
-      {/* Reset */}
-      <Card className="p-5">
-        <div className="flex items-center gap-2">
-          <RefreshCw className="h-5 w-5 text-[hsl(var(--warning))]" aria-hidden />
-          <h2 className="font-semibold">Reset demo data</h2>
-        </div>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Clear all saved progress and return to the welcome screen. This can&apos;t
-          be undone.
-        </p>
-        {!confirmReset ? (
-          <Button
-            variant="outline"
-            className="mt-4 w-full"
-            onClick={() => setConfirmReset(true)}
-          >
-            Reset demo data
-          </Button>
-        ) : (
-          <div className="mt-4 flex gap-2">
-            <Button
-              variant="ghost"
-              className="flex-1"
-              onClick={() => setConfirmReset(false)}
-            >
-              Cancel
-            </Button>
-            <Button variant="accent" className="flex-1" onClick={handleReset}>
-              Yes, reset
-            </Button>
-          </div>
-        )}
-      </Card>
+      {/* Feedback */}
+      <FeedbackForm />
+
+      {/* Data export + progress reset */}
+      <DataPrivacyPanel />
+
+      {/* Account deletion */}
+      <DeleteAccountPanel />
 
       <div className="flex items-center justify-center gap-2 pb-2 text-xs text-muted-foreground">
         <Shield className="h-4 w-4" aria-hidden />
