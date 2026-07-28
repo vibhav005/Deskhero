@@ -21,6 +21,7 @@ import { useTimer } from "@/hooks/use-timer";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Callout } from "@/components/ui/callout";
 import { ScoreRing } from "@/components/app/score-ring";
 import { categoryIcon, CATEGORY_LABEL } from "@/components/app/icon";
 import { completeQuest, skipQuest, replaceQuest } from "@/lib/actions/quests";
@@ -94,7 +95,9 @@ export function QuestDetailClient({ detail }: { detail: ActivityDetail }) {
           <Icon className="h-7 w-7" aria-hidden />
         </span>
         <div>
-          <h1 className="text-2xl font-extrabold leading-tight tracking-tight">{activity.title}</h1>
+          <h1 className="font-display text-2xl font-semibold leading-tight tracking-tight">
+            {activity.title}
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">{activity.summary}</p>
         </div>
       </header>
@@ -111,10 +114,9 @@ export function QuestDetailClient({ detail }: { detail: ActivityDetail }) {
       </div>
 
       {alreadyDone && (
-        <div className="flex items-center gap-2 rounded-2xl bg-success-soft p-3.5 text-success">
-          <Check className="h-5 w-5" aria-hidden />
-          <p className="text-sm font-semibold">You already completed this today. Nicely done!</p>
-        </div>
+        <Callout icon={Check} tone="success">
+          You already completed this today. Nicely done!
+        </Callout>
       )}
 
       {isWorkout && (
@@ -212,13 +214,9 @@ export function QuestDetailClient({ detail }: { detail: ActivityDetail }) {
       )}
 
       {activity.safety_notes && (
-        <div className="flex items-start gap-3 rounded-2xl border border-warning/40 bg-warning-soft p-4">
-          <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-[hsl(var(--warning))]" aria-hidden />
-          <div>
-            <p className="text-sm font-semibold">Safety guidance</p>
-            <p className="mt-0.5 text-sm leading-relaxed text-foreground">{activity.safety_notes}</p>
-          </div>
-        </div>
+        <Callout icon={ShieldAlert} tone="warning" title="Safety guidance">
+          {activity.safety_notes}
+        </Callout>
       )}
 
       {error && (

@@ -6,7 +6,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="mb-8">
         <Logo />
       </div>
-      {children}
+      <div className="animate-fade-in">{children}</div>
     </main>
   );
 }

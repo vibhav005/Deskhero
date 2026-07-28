@@ -4,10 +4,31 @@ import { useMemo, useState, useTransition } from "react";
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, ShieldAlert, Sparkles } from "lucide-react";
+import {
+  Armchair,
+  ArrowLeft,
+  ArrowRight,
+  Briefcase,
+  Check,
+  Dumbbell,
+  Flame,
+  Footprints,
+  Moon,
+  Shield,
+  ShieldAlert,
+  Shuffle,
+  Sparkles,
+  Sunrise,
+  Sunset,
+  Type,
+  Wind,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
 import { useStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Callout } from "@/components/ui/callout";
 import { LogoMark } from "@/components/app/logo";
 import { cn } from "@/lib/utils";
 import { saveOnboardingStep, completeOnboarding, type StepResult } from "@/lib/actions/onboarding";
@@ -21,7 +42,7 @@ import type {
   UserProfile,
 } from "@/lib/types";
 
-type Choice<T> = { value: T; label: string; hint?: string };
+type Choice<T> = { value: T; label: string; hint?: string; icon?: LucideIcon };
 
 const AGE_RANGES: Choice<string>[] = [
   { value: "18-24", label: "18-24" },
@@ -40,18 +61,18 @@ const HOURS: Choice<number>[] = [
 ];
 
 const ACTIVITY_LEVELS: Choice<ActivityLevel>[] = [
-  { value: "inactive", label: "Mostly inactive", hint: "Little movement in a day" },
-  { value: "light", label: "Lightly active", hint: "Occasional walks or stretches" },
-  { value: "moderate", label: "Moderately active", hint: "Regular movement already" },
+  { value: "inactive", label: "Mostly inactive", hint: "Little movement in a day", icon: Armchair },
+  { value: "light", label: "Lightly active", hint: "Occasional walks or stretches", icon: Footprints },
+  { value: "moderate", label: "Moderately active", hint: "Regular movement already", icon: Flame },
 ];
 
 const GOALS: Choice<Goal>[] = [
-  { value: "energy", label: "Energy" },
-  { value: "posture", label: "Posture" },
-  { value: "strength", label: "Strength" },
-  { value: "flexibility", label: "Flexibility" },
-  { value: "sleep", label: "Sleep" },
-  { value: "general", label: "General health" },
+  { value: "energy", label: "Energy", icon: Zap },
+  { value: "posture", label: "Posture", icon: Shield },
+  { value: "strength", label: "Strength", icon: Dumbbell },
+  { value: "flexibility", label: "Flexibility", icon: Wind },
+  { value: "sleep", label: "Sleep", icon: Moon },
+  { value: "general", label: "General health", icon: Sparkles },
 ];
 
 const DURATIONS: Choice<SessionDuration>[] = [
@@ -62,24 +83,24 @@ const DURATIONS: Choice<SessionDuration>[] = [
 ];
 
 const PREFERENCES: Choice<ActivityPreference>[] = [
-  { value: "walking", label: "Walking" },
-  { value: "stretching", label: "Stretching" },
-  { value: "strength", label: "Strength exercises" },
-  { value: "breathing", label: "Breathing" },
-  { value: "mixed", label: "A balanced mix" },
+  { value: "walking", label: "Walking", icon: Footprints },
+  { value: "stretching", label: "Stretching", icon: Wind },
+  { value: "strength", label: "Strength exercises", icon: Dumbbell },
+  { value: "breathing", label: "Breathing", icon: Wind },
+  { value: "mixed", label: "A balanced mix", icon: Shuffle },
 ];
 
 const WORK_SCHEDULES: Choice<string>[] = [
-  { value: "standard", label: "Standard 9-5" },
-  { value: "early", label: "Early shift" },
-  { value: "late", label: "Late shift" },
-  { value: "flexible", label: "Flexible / varies" },
+  { value: "standard", label: "Standard 9-5", icon: Briefcase },
+  { value: "early", label: "Early shift", icon: Sunrise },
+  { value: "late", label: "Late shift", icon: Sunset },
+  { value: "flexible", label: "Flexible / varies", icon: Shuffle },
 ];
 
 const REMINDERS: Choice<ReminderPreference>[] = [
-  { value: "work", label: "During work" },
-  { value: "morning", label: "Morning" },
-  { value: "evening", label: "Evening" },
+  { value: "work", label: "During work", icon: Briefcase },
+  { value: "morning", label: "Morning", icon: Sunrise },
+  { value: "evening", label: "Evening", icon: Sunset },
   { value: "none", label: "No reminders" },
 ];
 
@@ -307,7 +328,7 @@ export function OnboardingWizard({ initial }: { initial: OnboardingProgress }) {
               <StepShell title="What is your current activity level?" subtitle="This helps us keep things achievable.">
                 <OptionList>
                   {ACTIVITY_LEVELS.map((c) => (
-                    <OptionButton key={c.value} selected={activity === c.value} onClick={() => setActivity(c.value)} label={c.label} hint={c.hint} />
+                    <OptionButton key={c.value} selected={activity === c.value} onClick={() => setActivity(c.value)} label={c.label} hint={c.hint} icon={c.icon} />
                   ))}
                 </OptionList>
               </StepShell>
@@ -317,7 +338,7 @@ export function OnboardingWizard({ initial }: { initial: OnboardingProgress }) {
               <StepShell title="What would you most like to improve?" subtitle="Pick the one that matters most right now.">
                 <OptionGrid>
                   {GOALS.map((c) => (
-                    <OptionButton key={c.value} selected={goal === c.value} onClick={() => setGoal(c.value)} label={c.label} />
+                    <OptionButton key={c.value} selected={goal === c.value} onClick={() => setGoal(c.value)} label={c.label} icon={c.icon} />
                   ))}
                 </OptionGrid>
               </StepShell>
@@ -337,7 +358,7 @@ export function OnboardingWizard({ initial }: { initial: OnboardingProgress }) {
               <StepShell title="Which activities do you prefer?" subtitle="We'll lean toward what you enjoy.">
                 <OptionList>
                   {PREFERENCES.map((c) => (
-                    <OptionButton key={c.value} selected={preference === c.value} onClick={() => setPreference(c.value)} label={c.label} />
+                    <OptionButton key={c.value} selected={preference === c.value} onClick={() => setPreference(c.value)} label={c.label} icon={c.icon} />
                   ))}
                 </OptionList>
               </StepShell>
@@ -347,7 +368,7 @@ export function OnboardingWizard({ initial }: { initial: OnboardingProgress }) {
               <StepShell title="What does your work schedule look like?" subtitle="Helps us time nudges sensibly.">
                 <OptionGrid>
                   {WORK_SCHEDULES.map((c) => (
-                    <OptionButton key={c.value} selected={workSchedule === c.value} onClick={() => setWorkSchedule(c.value)} label={c.label} />
+                    <OptionButton key={c.value} selected={workSchedule === c.value} onClick={() => setWorkSchedule(c.value)} label={c.label} icon={c.icon} />
                   ))}
                 </OptionGrid>
               </StepShell>
@@ -357,7 +378,7 @@ export function OnboardingWizard({ initial }: { initial: OnboardingProgress }) {
               <StepShell title="When would you like movement reminders?" subtitle="You can change this anytime in settings.">
                 <OptionGrid>
                   {REMINDERS.map((c) => (
-                    <OptionButton key={c.value} selected={reminder === c.value} onClick={() => setReminder(c.value)} label={c.label} />
+                    <OptionButton key={c.value} selected={reminder === c.value} onClick={() => setReminder(c.value)} label={c.label} icon={c.icon} />
                   ))}
                 </OptionGrid>
               </StepShell>
@@ -366,8 +387,8 @@ export function OnboardingWizard({ initial }: { initial: OnboardingProgress }) {
             {step === 8 && (
               <StepShell title="Any accessibility preferences?" subtitle="Optional — you can change these later too.">
                 <OptionList>
-                  <OptionButton selected={reducedMotion} onClick={() => setReducedMotion((v) => !v)} label="Reduce motion" hint="Minimise animations across the app" />
-                  <OptionButton selected={largeText} onClick={() => setLargeText((v) => !v)} label="Larger text" hint="Increase base text size" />
+                  <OptionButton selected={reducedMotion} onClick={() => setReducedMotion((v) => !v)} label="Reduce motion" hint="Minimise animations across the app" icon={Sparkles} />
+                  <OptionButton selected={largeText} onClick={() => setLargeText((v) => !v)} label="Larger text" hint="Increase base text size" icon={Type} />
                 </OptionList>
               </StepShell>
             )}
@@ -384,22 +405,16 @@ export function OnboardingWizard({ initial }: { initial: OnboardingProgress }) {
 
             {step === 10 && (
               <StepShell title="You're all set!" subtitle="One last safety note before we build your plan.">
-                <div className="flex items-start gap-3 rounded-2xl border border-warning/40 bg-warning-soft p-4">
-                  <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-[hsl(var(--warning))]" aria-hidden />
-                  <p className="text-sm leading-relaxed text-foreground">
-                    DeskHero provides general wellness guidance and is not medical advice or a
-                    healthcare service. Stop exercising if you experience pain, dizziness, chest
-                    discomfort, or unusual shortness of breath, and seek medical attention if
-                    needed.
-                  </p>
-                </div>
-                <div className="mt-4 flex items-center gap-3 rounded-2xl bg-primary-soft/60 p-4">
-                  <Sparkles className="h-5 w-5 text-primary" aria-hidden />
-                  <p className="text-sm text-foreground">
-                    We&apos;ll build your first personalised plan of short, achievable quests
-                    based on your answers.
-                  </p>
-                </div>
+                <Callout icon={ShieldAlert} tone="warning">
+                  DeskHero provides general wellness guidance and is not medical advice or a
+                  healthcare service. Stop exercising if you experience pain, dizziness, chest
+                  discomfort, or unusual shortness of breath, and seek medical attention if
+                  needed.
+                </Callout>
+                <Callout icon={Sparkles} tone="primary" className="mt-3">
+                  We&apos;ll build your first personalised plan of short, achievable quests
+                  based on your answers.
+                </Callout>
 
                 <form action={completeAction} className="mt-4 flex flex-col gap-3">
                   <label className="flex items-start gap-2.5 text-sm">
@@ -454,7 +469,7 @@ export function OnboardingWizard({ initial }: { initial: OnboardingProgress }) {
 function StepShell({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
   return (
     <div>
-      <h1 className="text-2xl font-extrabold tracking-tight">{title}</h1>
+      <h1 className="font-display text-2xl font-semibold tracking-tight">{title}</h1>
       <p className="mt-2 text-sm text-muted-foreground">{subtitle}</p>
       <div className="mt-6">{children}</div>
     </div>
@@ -468,18 +483,40 @@ function OptionList({ children }: { children: React.ReactNode }) {
   return <div className="flex flex-col gap-3">{children}</div>;
 }
 
-function OptionButton({ selected, onClick, label, hint }: { selected: boolean; onClick: () => void; label: string; hint?: string }) {
+function OptionButton({
+  selected,
+  onClick,
+  label,
+  hint,
+  icon: Icon,
+}: {
+  selected: boolean;
+  onClick: () => void;
+  label: string;
+  hint?: string;
+  icon?: LucideIcon;
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-pressed={selected}
       className={cn(
-        "flex items-center justify-between gap-2 rounded-2xl border-2 px-4 py-3.5 text-left transition-all",
-        selected ? "border-primary bg-primary-soft/70 shadow-soft" : "border-border bg-surface hover:border-primary/40",
+        "flex items-center gap-3 rounded-xl border px-4 py-3.5 text-left transition-all",
+        selected ? "border-primary bg-primary-soft/60" : "border-border bg-surface hover:border-primary/40",
       )}
     >
-      <span>
+      {Icon && (
+        <span
+          className={cn(
+            "grid h-9 w-9 shrink-0 place-items-center rounded-full transition-colors",
+            selected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground",
+          )}
+        >
+          <Icon className="h-[18px] w-[18px]" aria-hidden />
+        </span>
+      )}
+      <span className="min-w-0 flex-1">
         <span className="block text-sm font-semibold">{label}</span>
         {hint && <span className="mt-0.5 block text-xs text-muted-foreground">{hint}</span>}
       </span>

@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { NAV_ITEMS } from "./nav-items";
+import { isNavItemActive, NAV_ITEMS } from "./nav-items";
+import { MoreMenu } from "./more-menu";
 
 /** Fixed bottom navigation shown on mobile / small screens. */
 export function BottomNav() {
   const pathname = usePathname();
   const items = NAV_ITEMS.filter((i) => i.primary);
+  const overflowItems = NAV_ITEMS.filter((i) => !i.primary);
 
   return (
     <nav
@@ -17,8 +19,7 @@ export function BottomNav() {
     >
       <ul className="mx-auto flex max-w-lg items-stretch justify-around px-1 pb-[env(safe-area-inset-bottom)]">
         {items.map((item) => {
-          const active =
-            pathname === item.href || pathname.startsWith(`${item.href}/`);
+          const active = isNavItemActive(pathname, item.href);
           const Icon = item.icon;
           return (
             <li key={item.href} className="flex-1">
@@ -26,7 +27,7 @@ export function BottomNav() {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-xl py-1.5 text-[11px] font-medium transition-colors",
+                  "flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-xl py-1.5 text-2xs font-medium transition-colors",
                   active
                     ? "text-primary"
                     : "text-muted-foreground hover:text-foreground",
@@ -45,6 +46,7 @@ export function BottomNav() {
             </li>
           );
         })}
+        <MoreMenu items={overflowItems} />
       </ul>
     </nav>
   );

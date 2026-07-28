@@ -32,7 +32,7 @@ export function PixelHero({ level, size = 72, className }: PixelHeroProps) {
         <span
           aria-hidden
           className={cn(
-            "absolute inset-0 rounded-2xl bg-accent/30 blur-md",
+            "absolute inset-0 rounded-2xl bg-primary/30 blur-md",
             !reduced && "animate-pulse",
           )}
         />

@@ -46,7 +46,7 @@ export function WelcomeContent() {
             ))}
           </div>
 
-          <h1 className="text-balance text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl">
+          <h1 className="font-display text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
             Level up your health, one small quest at a time.
           </h1>
           <p className="mt-4 text-pretty text-base leading-relaxed text-muted-foreground">

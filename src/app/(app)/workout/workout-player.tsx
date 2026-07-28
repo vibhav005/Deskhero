@@ -18,6 +18,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ScoreRing } from "@/components/app/score-ring";
+import { Callout } from "@/components/ui/callout";
 import { iconFor } from "@/components/app/icon";
 import { completeQuest } from "@/lib/actions/quests";
 import { formatTime, cn } from "@/lib/utils";
@@ -86,7 +87,7 @@ export function WorkoutPlayer({
           <Check className="h-12 w-12" aria-hidden />
         </motion.div>
         <div>
-          <h1 className="text-2xl font-extrabold">Workout complete!</h1>
+          <h1 className="font-display text-2xl font-semibold">Workout complete!</h1>
           <p className="mt-2 text-muted-foreground">
             {partOfToday
               ? `You earned ${activity.xp_value} XP. Let's build on today.`
@@ -124,16 +125,15 @@ export function WorkoutPlayer({
       </header>
 
       {alreadyDone && (
-        <div className="flex items-center gap-2 rounded-2xl bg-success-soft p-3.5 text-success">
-          <Check className="h-5 w-5" aria-hidden />
-          <p className="text-sm font-semibold">You already completed this today. Nicely done!</p>
-        </div>
+        <Callout icon={Check} tone="success">
+          You already completed this today. Nicely done!
+        </Callout>
       )}
       {!partOfToday && !alreadyDone && (
-        <div className="rounded-2xl bg-muted/60 p-3.5 text-sm text-muted-foreground">
+        <Callout tone="neutral">
           This workout isn&apos;t part of today&apos;s plan — you can still practice, but it
           won&apos;t award XP.
-        </div>
+        </Callout>
       )}
 
       <Progress value={progress} label={`Workout progress ${Math.round(progress)}%`} />
@@ -150,7 +150,7 @@ export function WorkoutPlayer({
             <span className="grid h-20 w-20 place-items-center rounded-3xl bg-primary-soft text-primary">
               <StepIcon className="h-10 w-10" aria-hidden />
             </span>
-            <h1 className="text-2xl font-extrabold tracking-tight">{current.exercise.name}</h1>
+            <h1 className="font-display text-2xl font-semibold tracking-tight">{current.exercise.name}</h1>
 
             {isTimed ? (
               <ScoreRing value={timer.progress * 100} size={150} strokeWidth={11}>
@@ -164,9 +164,9 @@ export function WorkoutPlayer({
                 </div>
               </ScoreRing>
             ) : (
-              <div className="grid h-[150px] w-[150px] place-items-center rounded-full border-8 border-primary-soft">
+              <div className="grid h-[150px] w-[150px] place-items-center rounded-full border-[10px] border-primary/25">
                 <div>
-                  <p className="text-4xl font-extrabold">{current.reps}</p>
+                  <p className="text-4xl font-extrabold tabular-nums">{current.reps}</p>
                   <p className="text-xs text-muted-foreground">reps</p>
                 </div>
               </div>

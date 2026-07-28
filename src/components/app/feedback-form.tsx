@@ -125,7 +125,7 @@ export function FeedbackForm() {
       )}
 
       <div className="flex gap-2">
-        <Button size="sm" disabled={pending || comments.trim().length < 5} onClick={handleSubmit}>
+        <Button size="sm" loading={pending} disabled={comments.trim().length < 5} onClick={handleSubmit}>
           Send
         </Button>
         <Button size="sm" variant="ghost" onClick={() => setOpen(false)}>

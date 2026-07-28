@@ -1,7 +1,21 @@
 import type { Metadata, Viewport } from "next";
+import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
 import { StoreProvider } from "@/lib/store";
 import { Celebration } from "@/components/app/celebration";
+import { cn } from "@/lib/utils";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "DeskHero — Level up your health, one small quest at a time",
@@ -10,7 +24,9 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0d1210",
+  // Matches --background's dark HSL value (28 14% 6%) from globals.css. Static
+  // metadata can't read CSS vars, so update this by hand if that value changes.
+  themeColor: "#110f0d",
   width: "device-width",
   initialScale: 1,
 };
@@ -21,7 +37,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={cn(inter.variable, fraunces.variable)}>
       <body className="min-h-dvh font-sans antialiased">
         <StoreProvider>
           {/* Skip link for keyboard + screen-reader users */}

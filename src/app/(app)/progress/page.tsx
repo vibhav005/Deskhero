@@ -37,7 +37,7 @@ export default async function ProgressPage() {
   return (
     <div className="flex flex-col gap-5">
       <header>
-        <h1 className="text-2xl font-extrabold tracking-tight">Your progress</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight">Your progress</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Gentle momentum over time — no pressure, just your rhythm.
         </p>
@@ -57,7 +57,7 @@ export default async function ProgressPage() {
             <p className="text-2xl font-extrabold leading-none">
               <AnimatedCounter value={score} />
             </p>
-            <p className="text-[10px] text-muted-foreground">today</p>
+            <p className="text-2xs text-muted-foreground">today</p>
           </div>
         </ScoreRing>
       </Card>

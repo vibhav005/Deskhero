@@ -1,4 +1,5 @@
 import { listBrowseChallenges, listMyChallenges } from "@/lib/queries/challenges";
+import { PageHeader } from "@/components/app/page-header";
 import { ChallengesClient } from "./challenges-client";
 
 export default async function ChallengesPage() {
@@ -9,12 +10,10 @@ export default async function ChallengesPage() {
 
   return (
     <div className="flex flex-col gap-5">
-      <header>
-        <h1 className="text-2xl font-extrabold tracking-tight">Challenges</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Team up with a small group to keep each other moving.
-        </p>
-      </header>
+      <PageHeader
+        title="Challenges"
+        description="Team up with a small group to keep each other moving."
+      />
 
       <ChallengesClient mine={mine} browse={browseNotJoined} />
     </div>
