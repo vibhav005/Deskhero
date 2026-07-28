@@ -15,6 +15,7 @@ import {
 import { useTimer } from "@/hooks/use-timer";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Callout } from "@/components/ui/callout";
 import { ScoreRing } from "@/components/app/score-ring";
 import { categoryIcon, CATEGORY_LABEL } from "@/components/app/icon";
 import { startWorkSession, completeBreak, skipBreak, endSessionEarly } from "@/lib/actions/workmode";
@@ -114,7 +115,7 @@ export function WorkModeClient({ breakActivities }: { breakActivities: Activity[
     <div className="flex flex-col gap-5">
       <header className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">Work Mode</h1>
+          <h1 className="font-display text-2xl font-semibold tracking-tight">Work Mode</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Focus in calm blocks, then take a short movement break.
           </p>
@@ -195,13 +196,10 @@ export function WorkModeClient({ breakActivities }: { breakActivities: Activity[
             </Button>
           </Card>
 
-          <Card className="flex items-center gap-3 bg-primary-soft/50 p-4">
-            <Timer className="h-5 w-5 shrink-0 text-primary" aria-hidden />
-            <p className="text-sm text-foreground">
-              When your session ends, DeskHero will suggest a short movement break — pick
-              posture, eye-care, hydration, or a walk.
-            </p>
-          </Card>
+          <Callout icon={Timer} tone="primary">
+            When your session ends, DeskHero will suggest a short movement break — pick
+            posture, eye-care, hydration, or a walk.
+          </Callout>
         </>
       )}
 
@@ -255,7 +253,7 @@ export function WorkModeClient({ breakActivities }: { breakActivities: Activity[
               <Coffee className="h-8 w-8" aria-hidden />
             </span>
             <div>
-              <h2 className="text-xl font-extrabold">Time for a movement break</h2>
+              <h2 className="font-display text-xl font-semibold">Time for a movement break</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 Nice focus session! Pick one and give your body a reset.
               </p>

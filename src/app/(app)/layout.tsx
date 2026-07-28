@@ -36,7 +36,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="mx-auto flex min-h-dvh w-full max-w-6xl">
       <ReminderHeartbeat />
       <Sidebar />
-      <div className="flex-1">
+      <div className="min-w-0 flex-1">
         <main
           id="main"
           className="mx-auto w-full max-w-2xl px-4 pb-28 pt-6 md:max-w-3xl md:px-8 md:pb-12"

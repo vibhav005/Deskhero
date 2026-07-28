@@ -26,3 +26,8 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/challenges", label: "Challenges", icon: Users, primary: false },
   { href: "/profile", label: "Profile", icon: User, primary: true },
 ];
+
+/** Shared active-route predicate for the sidebar, bottom nav, and its overflow menu. */
+export function isNavItemActive(pathname: string, href: string): boolean {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}

@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { Award, CalendarCheck, ChevronRight, Flame, Play, Sparkles } from "lucide-react";
+import { Award, CalendarCheck, ChevronRight, Flame, Play, Sparkles, Users } from "lucide-react";
 import { getDashboardData } from "@/lib/queries/dashboard";
 import { generateDailyPlan } from "@/lib/actions/quests";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Callout } from "@/components/ui/callout";
 import { ScoreRing } from "@/components/app/score-ring";
 import { AnimatedCounter } from "@/components/app/animated-counter";
 import { PixelHero } from "@/components/app/pixel-hero";
@@ -37,10 +38,12 @@ export default async function DashboardPage() {
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-6">
       <header>
         <p className="text-sm text-muted-foreground">{greeting},</p>
-        <h1 className="text-2xl font-extrabold tracking-tight">{displayName} 👋</h1>
+        <h1 className="font-display text-[1.75rem] font-semibold leading-tight tracking-tight">
+          {displayName} 👋
+        </h1>
       </header>
 
       <Card className="overflow-hidden">
@@ -61,31 +64,31 @@ export default async function DashboardPage() {
           </div>
           <ScoreRing value={score} label={`Daily health score ${score} of 100`}>
             <div className="text-center">
-              <p className="text-xl font-extrabold leading-none">
+              <p className="text-xl font-extrabold leading-none tabular-nums">
                 <AnimatedCounter value={score} />
               </p>
-              <p className="text-[10px] font-medium text-muted-foreground">score</p>
+              <p className="text-2xs font-medium text-muted-foreground">score</p>
             </div>
           </ScoreRing>
         </div>
-        <div className="px-5 pb-5">
-          <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
-            <span>
-              <AnimatedCounter value={xp} suffix=" XP" />
-            </span>
-            <span>{Math.round(level.progress * 100)}%</span>
-          </div>
-          <Progress value={level.progress * 100} label="Level progress" />
+        <div className="flex items-center justify-between gap-4 border-t border-border px-5 py-3.5">
+          <span className="text-xs tabular-nums text-muted-foreground">
+            <AnimatedCounter value={xp} suffix=" XP" />
+          </span>
+          <Progress value={level.progress * 100} className="h-1.5 flex-1" label="Level progress" />
+          <span className="text-xs tabular-nums text-muted-foreground">
+            {Math.round(level.progress * 100)}%
+          </span>
         </div>
       </Card>
 
-      <div className="grid grid-cols-2 gap-3">
-        <Card className="flex items-center gap-3 p-4">
-          <span className="grid h-11 w-11 place-items-center rounded-full bg-accent-soft text-accent">
+      <div className="flex items-stretch divide-x divide-border rounded-xl border border-border bg-card">
+        <div className="flex flex-1 items-center gap-3 p-4">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent-soft text-accent">
             <Flame className="h-5 w-5" aria-hidden />
           </span>
           <div>
-            <p className="text-xl font-bold leading-none">
+            <p className="text-lg font-bold leading-none tabular-nums">
               <AnimatedCounter value={streak} />
               <span className="ml-1 text-sm font-medium text-muted-foreground">
                 day{streak === 1 ? "" : "s"}
@@ -93,18 +96,18 @@ export default async function DashboardPage() {
             </p>
             <p className="mt-1 text-xs text-muted-foreground">Current streak</p>
           </div>
-        </Card>
-        <Card className="flex items-center gap-3 p-4">
-          <span className="grid h-11 w-11 place-items-center rounded-full bg-primary-soft text-primary">
+        </div>
+        <div className="flex flex-1 items-center gap-3 p-4">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary-soft text-primary">
             <CalendarCheck className="h-5 w-5" aria-hidden />
           </span>
           <div>
-            <p className="text-xl font-bold leading-none">
+            <p className="text-lg font-bold leading-none tabular-nums">
               <AnimatedCounter value={weeklyConsistency} suffix="%" />
             </p>
             <p className="mt-1 text-xs text-muted-foreground">Weekly rhythm</p>
           </div>
-        </Card>
+        </div>
       </div>
 
       <section aria-labelledby="today-heading">
@@ -152,23 +155,32 @@ export default async function DashboardPage() {
         </Link>
       )}
 
-      <Card className="flex items-center gap-3 bg-primary-soft/50 p-4">
-        <Sparkles className="h-5 w-5 shrink-0 text-primary" aria-hidden />
-        <p className="text-sm font-medium text-foreground">
-          Every movement counts. A small step is still progress.
-        </p>
-      </Card>
+      <Callout icon={Sparkles} tone="primary">
+        Every movement counts. A small step is still progress.
+      </Callout>
 
-      <Link
-        href="/achievements"
-        className={cn(buttonVariants({ variant: "ghost" }), "justify-between")}
-      >
-        <span className="inline-flex items-center gap-2">
-          <Award className="h-5 w-5" aria-hidden />
-          View all achievements
-        </span>
-        <ChevronRight className="h-5 w-5" aria-hidden />
-      </Link>
+      <div className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
+        <Link
+          href="/achievements"
+          className="flex items-center justify-between gap-3 p-3.5 text-sm font-medium transition-colors hover:bg-muted/40"
+        >
+          <span className="inline-flex items-center gap-2.5">
+            <Award className="h-[18px] w-[18px] text-muted-foreground" aria-hidden />
+            View all achievements
+          </span>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" aria-hidden />
+        </Link>
+        <Link
+          href="/challenges"
+          className="flex items-center justify-between gap-3 p-3.5 text-sm font-medium transition-colors hover:bg-muted/40"
+        >
+          <span className="inline-flex items-center gap-2.5">
+            <Users className="h-[18px] w-[18px] text-muted-foreground" aria-hidden />
+            Community challenges
+          </span>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" aria-hidden />
+        </Link>
+      </div>
     </div>
   );
 }

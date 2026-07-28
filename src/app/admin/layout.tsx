@@ -1,13 +1,7 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-
-const ADMIN_NAV = [
-  { href: "/admin", label: "Dashboard" },
-  { href: "/admin/activities", label: "Activities" },
-  { href: "/admin/xp", label: "XP adjustments" },
-  { href: "/admin/feedback", label: "Feedback" },
-];
+import { PageHeader } from "@/components/app/page-header";
+import { AdminNav } from "./admin-nav";
 
 /**
  * Server Component gate: redirects anyone who isn't profiles.role='admin'.
@@ -26,28 +20,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (profile?.role !== "admin") redirect("/dashboard");
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-4xl flex-col gap-6 px-4 py-8 md:px-8">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-xl font-extrabold tracking-tight">DeskHero Admin</h1>
-        <nav className="flex flex-wrap gap-1.5">
-          {ADMIN_NAV.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="rounded-full border border-border bg-surface px-3.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              {item.label}
-            </Link>
-          ))}
-          <Link
-            href="/dashboard"
-            className="rounded-full px-3.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Exit
-          </Link>
-        </nav>
-      </header>
+    <main
+      id="main"
+      className="mx-auto flex min-h-dvh w-full max-w-4xl flex-col gap-6 px-4 py-8 md:px-8"
+    >
+      <PageHeader title="Admin" description="Catalog, XP, and feedback management." action={<AdminNav />} />
       {children}
-    </div>
+    </main>
   );
 }

@@ -100,24 +100,26 @@ export function XpAdminClient() {
             Adjusting <span className="font-semibold">{selected.display_name ?? "Unnamed"}</span> (currently{" "}
             {selected.current_xp} XP)
           </p>
-          <label className="flex flex-col gap-1.5 text-sm font-medium">
-            Amount (use a negative number to subtract)
-            <input
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(Number(e.target.value))}
-              className="w-40 rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            />
-          </label>
-          <label className="flex flex-col gap-1.5 text-sm font-medium">
-            Reason (required, logged in the audit trail)
-            <textarea
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              rows={2}
-              className="rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            />
-          </label>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <label className="flex flex-col gap-1.5 text-sm font-medium">
+              Amount (use a negative number to subtract)
+              <input
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(Number(e.target.value))}
+                className="rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              />
+            </label>
+            <label className="flex flex-col gap-1.5 text-sm font-medium">
+              Reason (required, logged in the audit trail)
+              <textarea
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                rows={2}
+                className="rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              />
+            </label>
+          </div>
           <div className="flex gap-2">
             <Button
               size="sm"

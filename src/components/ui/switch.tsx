@@ -29,7 +29,7 @@ export function Switch({ checked, onCheckedChange, id, label, disabled }: Switch
     >
       <span
         className={cn(
-          "inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform",
+          "inline-block h-5 w-5 transform rounded-full bg-foreground shadow transition-transform",
           checked ? "translate-x-6" : "translate-x-1",
         )}
       />
