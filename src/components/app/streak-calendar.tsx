@@ -118,7 +118,7 @@ export function StreakCalendar({
           ))}
         </div>
       </div>
-      <div className="flex items-center justify-end gap-1.5 text-[11px] text-muted-foreground">
+      <div className="flex items-center justify-end gap-1.5 text-2xs text-muted-foreground">
         <span>Less</span>
         {([0, 1, 2, 3, 4] as const).map((lvl) => (
           <span key={lvl} className={cn("h-[11px] w-[11px] rounded-[3px]", LEVEL_CLASS[lvl])} />

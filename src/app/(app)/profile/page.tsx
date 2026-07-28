@@ -17,7 +17,9 @@ import { LEVELS } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
+import { Chip } from "@/components/ui/chip";
+import { Input } from "@/components/ui/input";
+import { Callout } from "@/components/ui/callout";
 import { PixelHero } from "@/components/app/pixel-hero";
 import { ReminderSettings } from "@/components/app/reminder-settings";
 import { AnalyticsConsentToggle } from "@/components/app/analytics-consent-toggle";
@@ -72,11 +74,11 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-6">
       <header className="flex items-center gap-3">
         <PixelHero level={level.level} size={80} />
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">
+          <h1 className="font-display text-2xl font-semibold tracking-tight">
             {profile.name}
           </h1>
           <p className="text-sm text-muted-foreground">
@@ -100,214 +102,223 @@ export default function ProfilePage() {
           </p>
           <div className="flex flex-wrap gap-2">
             {LEVELS.map((l) => (
-              <button
+              <Chip
                 key={l.level}
-                type="button"
+                active={level.level === l.level}
                 onClick={() => setXp(l.minXp)}
-                aria-pressed={level.level === l.level}
-                className={cn(
-                  "rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors",
-                  level.level === l.level
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-surface text-muted-foreground hover:text-foreground",
-                )}
               >
                 L{l.level} · {l.name}
-              </button>
+              </Chip>
             ))}
           </div>
         </Card>
       )}
 
-      {/* Name */}
-      <Card className="p-5">
-        <label htmlFor="name" className="mb-2 block text-sm font-semibold">
-          What should we call you?
-        </label>
-        <input
-          id="name"
-          value={profile.name}
-          onChange={(e) => updateProfile({ name: e.target.value })}
-          className="w-full rounded-xl border border-border bg-surface px-4 py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        />
-      </Card>
-
-      {/* Primary goal */}
-      <Card className="p-5">
-        <p className="mb-3 text-sm font-semibold">Primary goal</p>
-        <div className="flex flex-wrap gap-2">
-          {GOALS.map((g) => (
-            <Chip
-              key={g.value}
-              active={profile.goal === g.value}
-              onClick={() => changeGoal(g.value)}
-            >
-              {g.label}
-            </Chip>
-          ))}
-        </div>
-      </Card>
-
-      {/* Session duration */}
-      <Card className="p-5">
-        <p className="mb-3 text-sm font-semibold">Preferred session duration</p>
-        <div className="flex flex-wrap gap-2">
-          {DURATIONS.map((d) => (
-            <Chip
-              key={d}
-              active={profile.sessionDuration === d}
-              onClick={() => changeDuration(d)}
-            >
-              {d} min
-            </Chip>
-          ))}
-        </div>
-      </Card>
-
-      {/* Reminder preference */}
-      <Card className="p-5">
-        <p className="mb-3 text-sm font-semibold">Reminder preference</p>
-        <div className="flex flex-wrap gap-2">
-          {REMINDERS.map((r) => (
-            <Chip
-              key={r.value}
-              active={profile.reminderPreference === r.value}
-              onClick={() => updateProfile({ reminderPreference: r.value })}
-            >
-              {r.label}
-            </Chip>
-          ))}
-        </div>
-      </Card>
-
-      {/* Streak freeze */}
-      <Card className="flex items-center gap-3 p-5">
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary-soft text-primary">
-          <Snowflake className="h-5 w-5" aria-hidden />
-        </span>
-        <div className="flex-1">
-          <p className="font-semibold">Weekly streak freeze</p>
-          <p className="text-sm text-muted-foreground">
-            {state.streakFreezeAvailable
-              ? "Protect your streak on a busy day — one available this week."
-              : "Used this week. It refreshes next week."}
-          </p>
-        </div>
-        <Button
-          variant={state.streakFreezeAvailable ? "subtle" : "secondary"}
-          size="sm"
-          onClick={useStreakFreeze}
-          disabled={!state.streakFreezeAvailable}
-        >
-          {state.streakFreezeAvailable ? "Use" : "Used"}
-        </Button>
-      </Card>
-
-      {/* Appearance */}
-      <Card className="p-5">
-        <p className="mb-3 text-sm font-semibold">Appearance</p>
-        <div className="flex gap-2">
-          <Chip
-            active={state.settings.theme === "dark"}
-            onClick={() => updateSettings({ theme: "dark" })}
-          >
-            Dark
-          </Chip>
-          <Chip
-            active={state.settings.theme === "light"}
-            onClick={() => updateSettings({ theme: "light" })}
-          >
-            Light
-          </Chip>
-        </div>
-      </Card>
-
-      {/* Settings toggles */}
-      <Card className="divide-y divide-border p-0">
-        <SettingRow
-          icon={Volume2}
-          title="Sound effects"
-          description="Play a soft sound on completions."
-        >
-          <Switch
-            checked={state.settings.sound}
-            onCheckedChange={(v) => updateSettings({ sound: v })}
-            label="Toggle sound effects"
+      <Section label="Profile">
+        <Card className="p-5">
+          <label htmlFor="name" className="mb-2 block text-sm font-semibold">
+            What should we call you?
+          </label>
+          <Input
+            id="name"
+            value={profile.name}
+            onChange={(e) => updateProfile({ name: e.target.value })}
           />
-        </SettingRow>
-        <SettingRow
-          icon={Sparkles}
-          title="Reduced motion"
-          description="Minimise animations across the app."
-        >
-          <Switch
-            checked={state.settings.reducedMotion}
-            onCheckedChange={(v) => updateSettings({ reducedMotion: v })}
-            label="Toggle reduced motion"
-          />
-        </SettingRow>
-        <AnalyticsConsentToggle />
-      </Card>
+        </Card>
 
-      {/* Reminders */}
-      <ReminderSettings />
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <Card className="p-5">
+            <p className="mb-3 text-sm font-semibold">Primary goal</p>
+            <div className="flex flex-wrap gap-2">
+              {GOALS.map((g) => (
+                <Chip
+                  key={g.value}
+                  active={profile.goal === g.value}
+                  onClick={() => changeGoal(g.value)}
+                >
+                  {g.label}
+                </Chip>
+              ))}
+            </div>
+          </Card>
 
-      {/* Health & safety */}
-      <Card className="p-5">
-        <div className="flex items-center gap-2">
-          <HeartPulse className="h-5 w-5 text-primary" aria-hidden />
-          <h2 className="font-semibold">Health &amp; safety</h2>
+          <Card className="p-5">
+            <p className="mb-3 text-sm font-semibold">Preferred session duration</p>
+            <div className="flex flex-wrap gap-2">
+              {DURATIONS.map((d) => (
+                <Chip
+                  key={d}
+                  active={profile.sessionDuration === d}
+                  onClick={() => changeDuration(d)}
+                >
+                  {d} min
+                </Chip>
+              ))}
+            </div>
+          </Card>
         </div>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+      </Section>
+
+      <Section label="Notifications">
+        <Card className="p-5">
+          <p className="mb-3 text-sm font-semibold">Reminder preference</p>
+          <div className="flex flex-wrap gap-2">
+            {REMINDERS.map((r) => (
+              <Chip
+                key={r.value}
+                active={profile.reminderPreference === r.value}
+                onClick={() => updateProfile({ reminderPreference: r.value })}
+              >
+                {r.label}
+              </Chip>
+            ))}
+          </div>
+        </Card>
+
+        <ReminderSettings />
+      </Section>
+
+      <Section label="Appearance & sound">
+        <Card className="flex items-center gap-3 p-5">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary-soft text-primary">
+            <Snowflake className="h-5 w-5" aria-hidden />
+          </span>
+          <div className="flex-1">
+            <p className="font-semibold">Weekly streak freeze</p>
+            <p className="text-sm text-muted-foreground">
+              {state.streakFreezeAvailable
+                ? "Protect your streak on a busy day — one available this week."
+                : "Used this week. It refreshes next week."}
+            </p>
+          </div>
+          <Button
+            variant={state.streakFreezeAvailable ? "subtle" : "secondary"}
+            size="sm"
+            onClick={useStreakFreeze}
+            disabled={!state.streakFreezeAvailable}
+          >
+            {state.streakFreezeAvailable ? "Use" : "Used"}
+          </Button>
+        </Card>
+
+        <Card className="p-5">
+          <p className="mb-3 text-sm font-semibold">Appearance</p>
+          <div className="flex gap-2">
+            <Chip
+              active={state.settings.theme === "dark"}
+              onClick={() => updateSettings({ theme: "dark" })}
+            >
+              Dark
+            </Chip>
+            <Chip
+              active={state.settings.theme === "light"}
+              onClick={() => updateSettings({ theme: "light" })}
+            >
+              Light
+            </Chip>
+          </div>
+        </Card>
+
+        <Card className="divide-y divide-border p-0">
+          <SettingRow
+            icon={Volume2}
+            title="Sound effects"
+            description="Play a soft sound on completions."
+          >
+            <Switch
+              checked={state.settings.sound}
+              onCheckedChange={(v) => updateSettings({ sound: v })}
+              label="Toggle sound effects"
+            />
+          </SettingRow>
+          <SettingRow
+            icon={Sparkles}
+            title="Reduced motion"
+            description="Minimise animations across the app."
+          >
+            <Switch
+              checked={state.settings.reducedMotion}
+              onCheckedChange={(v) => updateSettings({ reducedMotion: v })}
+              label="Toggle reduced motion"
+            />
+          </SettingRow>
+          <AnalyticsConsentToggle />
+        </Card>
+      </Section>
+
+      <Section label="Privacy & data">
+        <Callout icon={HeartPulse} tone="neutral" title="Health & safety">
           DeskHero provides general wellness guidance and is not medical advice.
           Stop exercising if you experience pain, dizziness, chest discomfort, or
           unusual shortness of breath. If you have a health condition, check with
           a professional before starting new activity.
-        </p>
-      </Card>
+        </Callout>
 
-      {/* Privacy */}
-      <Card className="flex items-start gap-3 bg-muted/40 p-5">
-        <Lock className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" aria-hidden />
-        <div>
-          <p className="font-semibold">Privacy</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Your account and progress are stored securely and only used to run
-            DeskHero. We never sell your data or show you ads.
+        <Callout icon={Lock} tone="neutral" title="Privacy">
+          Your account and progress are stored securely and only used to run
+          DeskHero. We never sell your data or show you ads.
+        </Callout>
+
+        <DataPrivacyPanel />
+      </Section>
+
+      <Section label="Danger zone" tone="warning">
+        <Card className="p-5">
+          <div className="flex items-center gap-2">
+            <LogOut className="h-5 w-5 text-muted-foreground" aria-hidden />
+            <h3 className="font-semibold">Account</h3>
+          </div>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Signed in. Signing out ends your session on this device.
           </p>
-        </div>
-      </Card>
+          <form action={signOut}>
+            <Button type="submit" variant="outline" className="mt-4 w-full">
+              Sign out
+            </Button>
+          </form>
+        </Card>
 
-      {/* Account */}
-      <Card className="p-5">
-        <div className="flex items-center gap-2">
-          <LogOut className="h-5 w-5 text-muted-foreground" aria-hidden />
-          <h2 className="font-semibold">Account</h2>
-        </div>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Signed in. Signing out ends your session on this device.
-        </p>
-        <form action={signOut}>
-          <Button type="submit" variant="outline" className="mt-4 w-full">
-            Sign out
-          </Button>
-        </form>
-      </Card>
+        <DeleteAccountPanel />
+      </Section>
 
-      {/* Feedback */}
-      <FeedbackForm />
-
-      {/* Data export + progress reset */}
-      <DataPrivacyPanel />
-
-      {/* Account deletion */}
-      <DeleteAccountPanel />
+      <Section label="Feedback">
+        <FeedbackForm />
+      </Section>
 
       <div className="flex items-center justify-center gap-2 pb-2 text-xs text-muted-foreground">
         <Shield className="h-4 w-4" aria-hidden />
-        DeskHero prototype · Phase 1
+        DeskHero
       </div>
     </div>
+  );
+}
+
+function Section({
+  label,
+  tone = "default",
+  children,
+}: {
+  label: string;
+  tone?: "default" | "warning";
+  children: React.ReactNode;
+}) {
+  return (
+    <section
+      className={cn(
+        "flex flex-col gap-3",
+        tone === "warning" && "border-t border-dashed border-border pt-6",
+      )}
+    >
+      <h2
+        className={cn(
+          "text-xs font-semibold uppercase tracking-wide",
+          tone === "warning" ? "text-[hsl(var(--warning))]" : "text-muted-foreground",
+        )}
+      >
+        {label}
+      </h2>
+      {children}
+    </section>
   );
 }
 
@@ -333,31 +344,5 @@ function SettingRow({
       </div>
       {children}
     </div>
-  );
-}
-
-function Chip({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={cn(
-        "rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors",
-        active
-          ? "border-primary bg-primary text-primary-foreground"
-          : "border-border bg-surface text-muted-foreground hover:text-foreground",
-      )}
-    >
-      {children}
-    </button>
   );
 }

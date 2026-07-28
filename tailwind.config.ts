@@ -43,6 +43,7 @@ const config: Config = {
         },
         warning: {
           DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
           soft: "hsl(var(--warning-soft))",
         },
         card: {
@@ -64,6 +65,10 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "Georgia", "serif"],
+      },
+      fontSize: {
+        "2xs": ["0.625rem", { lineHeight: "0.875rem" }],
       },
       boxShadow: {
         soft: "0 1px 2px rgba(0, 0, 0, 0.16), 0 8px 24px rgba(0, 0, 0, 0.24)",
@@ -73,6 +78,9 @@ const config: Config = {
         "glow-accent": "0 0 0 1px hsl(var(--accent) / 0.4), 0 4px 20px hsl(var(--accent) / 0.35)",
         "glow-success": "0 0 0 1px hsl(var(--success) / 0.4), 0 4px 20px hsl(var(--success) / 0.3)",
         "glow-gold": "0 0 0 1px hsl(var(--tier-gold) / 0.5), 0 4px 20px hsl(var(--tier-gold) / 0.4)",
+        "glow-warning": "0 0 0 1px hsl(var(--warning) / 0.4), 0 4px 20px hsl(var(--warning) / 0.35)",
+        "glow-bronze": "0 0 0 1px hsl(var(--tier-bronze) / 0.5), 0 4px 20px hsl(var(--tier-bronze) / 0.25)",
+        "glow-silver": "0 0 0 1px hsl(var(--tier-silver) / 0.5), 0 4px 20px hsl(var(--tier-silver) / 0.25)",
       },
       keyframes: {
         "fade-in": {

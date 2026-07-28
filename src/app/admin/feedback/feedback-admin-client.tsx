@@ -2,9 +2,11 @@
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { MessageSquare } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
 import { reviewFeedback } from "@/lib/actions/admin";
 import type { AdminFeedbackRow } from "@/lib/queries/admin";
 
@@ -29,7 +31,7 @@ export function FeedbackAdminClient({ feedback }: { feedback: AdminFeedbackRow[]
     <div className="flex flex-col gap-5">
       <h2 className="font-semibold text-muted-foreground">Feedback ({feedback.length})</h2>
       {feedback.length === 0 ? (
-        <Card className="p-5 text-sm text-muted-foreground">No feedback yet.</Card>
+        <EmptyState icon={MessageSquare} title="No feedback yet" />
       ) : (
         <div className="flex flex-col gap-2.5">
           {feedback.map((f) => (

@@ -3,85 +3,85 @@
 @tailwind utilities;
 
 :root {
-  /* DeskHero — premium game-dashboard palette. Dark by default: deep teal-charcoal
-     surfaces with a luminous teal primary + warm apricot accent built for glow. */
-  --background: 200 22% 6%;
-  --foreground: 60 15% 95%;
-  --surface: 200 20% 9%;
+  /* DeskHero — "Warm Editorial Momentum". Dark by default: warm ink surfaces
+     with a confident gold primary (the product's own reward color, not a
+     decorative pick) and a quiet terracotta secondary tint. */
+  --background: 28 14% 6%;
+  --foreground: 40 20% 95%;
+  --surface: 28 13% 9%;
 
-  --card: 200 19% 11%;
-  --card-foreground: 60 15% 95%;
+  --card: 28 12% 11%;
+  --card-foreground: 40 20% 95%;
 
-  --primary: 168 72% 46%; /* luminous teal — reads well as a glow on dark */
-  --primary-foreground: 200 30% 7%;
-  --primary-soft: 168 40% 16%;
+  --primary: 42 88% 56%; /* gold — the one deliberate accent */
+  --primary-foreground: 40 45% 10%;
+  --primary-soft: 42 55% 15%;
 
-  --accent: 20 92% 66%; /* warm apricot highlight */
-  --accent-foreground: 20 40% 10%;
-  --accent-soft: 20 55% 15%;
+  --accent: 18 45% 58%; /* muted terracotta — quiet, used sparingly */
+  --accent-foreground: 18 40% 10%;
+  --accent-soft: 18 40% 15%;
 
-  --muted: 200 14% 15%;
-  --muted-foreground: 200 10% 66%;
+  --muted: 28 8% 15%;
+  --muted-foreground: 30 6% 65%;
 
-  --success: 150 60% 48%;
-  --success-foreground: 150 40% 7%;
-  --success-soft: 150 45% 14%;
+  --success: 152 55% 46%; /* movement / completion green */
+  --success-foreground: 152 40% 7%;
+  --success-soft: 152 45% 14%;
 
-  --warning: 38 90% 58%;
-  --warning-foreground: 38 45% 8%;
-  --warning-soft: 38 45% 15%;
+  --warning: 14 85% 60%; /* coral — distinct from gold, reads as "alert" */
+  --warning-foreground: 14 45% 8%;
+  --warning-soft: 14 45% 15%;
 
   /* Achievement rarity tiers */
   --tier-bronze: 25 55% 52%;
   --tier-silver: 210 14% 72%;
-  --tier-gold: 45 92% 58%;
+  --tier-gold: 48 95% 60%; /* brighter/shinier than --primary — reward context */
 
-  --border: 200 15% 19%;
-  --input: 200 15% 19%;
-  --ring: 168 72% 46%;
+  --border: 28 10% 18%;
+  --input: 28 10% 18%;
+  --ring: 42 88% 56%;
 
-  --radius: 0.875rem;
+  --radius: 0.75rem;
 
-  /* Confident, slightly rounded system font stack — no network fonts required. */
-  --font-sans: "SF Pro Rounded", ui-rounded, "Nunito", "Segoe UI", system-ui,
-    -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  /* --font-sans / --font-display are set by next/font (see layout.tsx) via a
+     className on <html> — Inter for UI text, Fraunces for editorial headings. */
 }
 
 /* Optional light appearance, toggled from Profile > Appearance */
 .light {
-  --background: 60 20% 98%;
-  --foreground: 175 25% 12%;
-  --surface: 0 0% 100%;
+  --background: 40 30% 97%;
+  --foreground: 28 25% 12%;
+  --surface: 38 28% 98%;
 
   --card: 0 0% 100%;
-  --card-foreground: 175 25% 12%;
+  --card-foreground: 28 25% 12%;
 
-  --primary: 172 66% 40%;
+  --primary: 36 78% 42%;
   --primary-foreground: 0 0% 100%;
-  --primary-soft: 172 55% 92%;
+  --primary-soft: 40 70% 93%;
 
-  --accent: 18 92% 68%;
-  --accent-foreground: 20 40% 18%;
-  --accent-soft: 20 90% 94%;
+  --accent: 16 50% 48%;
+  --accent-foreground: 0 0% 100%;
+  --accent-soft: 16 55% 94%;
 
-  --muted: 170 12% 95%;
-  --muted-foreground: 175 10% 40%;
+  --muted: 38 16% 93%;
+  --muted-foreground: 30 10% 40%;
 
-  --success: 150 55% 42%;
+  --success: 150 50% 38%;
   --success-foreground: 0 0% 100%;
-  --success-soft: 150 55% 93%;
+  --success-soft: 150 50% 93%;
 
-  --warning: 38 92% 55%;
+  --warning: 12 75% 50%;
   --warning-foreground: 0 0% 100%;
-  --warning-soft: 38 90% 94%;
+  --warning-soft: 12 75% 94%;
 
   --tier-bronze: 25 60% 42%;
-  --tier-silver: 210 10% 55%;
-  --tier-gold: 42 80% 45%;
+  --tier-silver: 210 10% 50%;
+  --tier-gold: 44 85% 42%;
 
-  --border: 170 14% 90%;
-  --input: 170 14% 90%;
-  --ring: 172 66% 40%;
+  --border: 35 20% 88%;
+  --input: 35 20% 88%;
+  --ring: 36 78% 42%;
 }
 
 * {

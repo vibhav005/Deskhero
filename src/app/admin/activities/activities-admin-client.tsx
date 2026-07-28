@@ -7,6 +7,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
+import { Select } from "@/components/ui/select";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { deleteActivity, setActivityActive, upsertActivity } from "@/lib/actions/admin";
 import type { AdminActivityRow } from "@/lib/queries/admin";
 import type { UpsertActivityInput } from "@/lib/validation/admin.schema";
@@ -30,6 +32,7 @@ const emptyForm = (): UpsertActivityInput => ({
 export function ActivitiesAdminClient({ activities }: { activities: AdminActivityRow[] }) {
   const router = useRouter();
   const [editing, setEditing] = useState<UpsertActivityInput | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<AdminActivityRow | null>(null);
   const [pending, startTransition] = useTransition();
 
   function toggleActive(activityId: string, isActive: boolean) {
@@ -42,6 +45,7 @@ export function ActivitiesAdminClient({ activities }: { activities: AdminActivit
   function handleDelete(activityId: string) {
     startTransition(async () => {
       await deleteActivity({ activityId });
+      setConfirmDelete(null);
       router.refresh();
     });
   }
@@ -104,9 +108,7 @@ export function ActivitiesAdminClient({ activities }: { activities: AdminActivit
               size="icon"
               variant="ghost"
               disabled={pending}
-              onClick={() => {
-                if (confirm(`Delete "${a.title}"? This can't be undone.`)) handleDelete(a.id);
-              }}
+              onClick={() => setConfirmDelete(a)}
               aria-label={`Delete ${a.title}`}
             >
               <Trash2 className="h-4 w-4" aria-hidden />
@@ -114,6 +116,16 @@ export function ActivitiesAdminClient({ activities }: { activities: AdminActivit
           </Card>
         ))}
       </div>
+
+      <ConfirmDialog
+        open={!!confirmDelete}
+        onOpenChange={(open) => !open && setConfirmDelete(null)}
+        title={`Delete "${confirmDelete?.title}"?`}
+        description="This can't be undone."
+        confirmLabel="Delete"
+        pending={pending}
+        onConfirm={() => confirmDelete && handleDelete(confirmDelete.id)}
+      />
     </div>
   );
 }
@@ -244,17 +256,13 @@ function SelectField<T extends string>({
   return (
     <label className="flex flex-col gap-1.5 text-sm font-medium">
       {label}
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value as T)}
-        className="rounded-xl border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      >
+      <Select value={value} onChange={(e) => onChange(e.target.value as T)}>
         {options.map((o) => (
           <option key={o} value={o}>
             {o}
           </option>
         ))}
-      </select>
+      </Select>
     </label>
   );
 }

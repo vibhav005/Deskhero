@@ -6,6 +6,7 @@ import { Send } from "lucide-react";
 import { requestPasswordReset, type ActionResult } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Field } from "@/components/ui/field";
 
 const initialState: ActionResult = { ok: true };
 
@@ -15,7 +16,7 @@ export default function ResetPasswordPage() {
   return (
     <div className="flex flex-col gap-5">
       <div>
-        <h1 className="text-2xl font-extrabold tracking-tight">Reset your password</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight">Reset your password</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           We&apos;ll email you a link to set a new password.
         </p>
@@ -23,16 +24,7 @@ export default function ResetPasswordPage() {
 
       <Card className="p-5">
         <form action={formAction} className="flex flex-col gap-3">
-          <label className="flex flex-col gap-1.5 text-sm font-medium">
-            Email
-            <input
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-              className="rounded-xl border border-border bg-surface px-3.5 py-2.5 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            />
-          </label>
+          <Field label="Email" name="email" type="email" autoComplete="email" required />
           {state.message && (
             <p role="status" className={state.ok ? "text-xs text-success" : "text-xs text-[hsl(var(--warning))]"}>
               {state.message}

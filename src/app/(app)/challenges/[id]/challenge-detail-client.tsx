@@ -2,10 +2,13 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { Copy, Crown, Flag, LogOut, Shield, Trophy, Users } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Callout } from "@/components/ui/callout";
 import {
   joinPublicChallenge,
   leaveChallenge,
@@ -59,7 +62,7 @@ export function ChallengeDetailClient({ detail, isAdmin }: { detail: ChallengeDe
     <div className="flex flex-col gap-5">
       <header>
         <div className="flex flex-wrap items-center gap-2">
-          <h1 className="text-2xl font-extrabold tracking-tight">{challenge.name}</h1>
+          <h1 className="font-display text-2xl font-semibold tracking-tight">{challenge.name}</h1>
           <Badge variant="outline">{VISIBILITY_LABEL[challenge.visibility]}</Badge>
           {challenge.status !== "active" && <Badge variant="warning">{challenge.status}</Badge>}
         </div>
@@ -69,9 +72,9 @@ export function ChallengeDetailClient({ detail, isAdmin }: { detail: ChallengeDe
       </header>
 
       {challenge.status === "disabled" && (
-        <Card className="border-[hsl(var(--warning)/0.4)] bg-warning-soft p-4 text-sm">
+        <Callout tone="warning">
           This challenge has been disabled by an admin and is no longer active for anyone.
-        </Card>
+        </Callout>
       )}
 
       {!isActiveMember ? (
@@ -103,14 +106,19 @@ export function ChallengeDetailClient({ detail, isAdmin }: { detail: ChallengeDe
               <h2 className="font-semibold">Leaderboard</h2>
             </div>
             {leaderboard.length === 0 ? (
-              <p className="mt-3 text-sm text-muted-foreground">
-                No contributions yet — complete a quest to be the first on the board.
-              </p>
+              <EmptyState
+                className="mt-3 border-none p-0 text-left"
+                title="No contributions yet"
+                description="Complete a quest to be the first on the board."
+              />
             ) : (
               <ol className="mt-3 flex flex-col gap-2">
                 {leaderboard.map((row, i) => (
-                  <li
+                  <motion.li
                     key={row.user_id}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
                     className="flex items-center justify-between rounded-xl border border-border bg-surface px-3.5 py-2.5"
                   >
                     <span className="flex items-center gap-2 text-sm font-medium">
@@ -120,7 +128,7 @@ export function ChallengeDetailClient({ detail, isAdmin }: { detail: ChallengeDe
                     <span className="text-sm text-muted-foreground">
                       {row.contribution_points} pts · {row.contribution_count} completions
                     </span>
-                  </li>
+                  </motion.li>
                 ))}
               </ol>
             )}

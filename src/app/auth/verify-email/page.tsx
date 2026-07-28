@@ -24,7 +24,7 @@ export default function VerifyEmailPage() {
         <span className="grid h-14 w-14 place-items-center rounded-full bg-primary-soft text-primary">
           <MailCheck className="h-7 w-7" aria-hidden />
         </span>
-        <h1 className="text-xl font-extrabold tracking-tight">Check your email</h1>
+        <h1 className="font-display text-xl font-semibold tracking-tight">Check your email</h1>
         <p className="text-sm text-muted-foreground">
           We&apos;ve sent a verification link to your inbox. Click it to activate your account,
           then come back here.

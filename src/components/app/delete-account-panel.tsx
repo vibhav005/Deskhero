@@ -55,7 +55,7 @@ export function DeleteAccountPanel() {
             </p>
           )}
           <div className="flex gap-2">
-            <Button variant="accent" size="sm" disabled={pending || !password} onClick={handleDelete}>
+            <Button variant="accent" size="sm" loading={pending} disabled={!password} onClick={handleDelete}>
               Permanently delete
             </Button>
             <Button variant="ghost" size="sm" onClick={() => setConfirming(false)}>

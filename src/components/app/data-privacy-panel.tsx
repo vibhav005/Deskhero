@@ -51,7 +51,7 @@ export function DataPrivacyPanel() {
         </p>
       </div>
 
-      <Button variant="outline" size="sm" disabled={pending} onClick={handleExport} className="w-full sm:w-auto">
+      <Button variant="outline" size="sm" loading={pending} onClick={handleExport} className="w-full sm:w-auto">
         <Download className="h-4 w-4" aria-hidden />
         Export my data
       </Button>
@@ -70,7 +70,7 @@ export function DataPrivacyPanel() {
               This can&apos;t be undone.
             </p>
             <div className="flex gap-2">
-              <Button variant="accent" size="sm" disabled={pending} onClick={handleReset}>
+              <Button variant="accent" size="sm" loading={pending} onClick={handleReset}>
                 Yes, reset my progress
               </Button>
               <Button variant="ghost" size="sm" onClick={() => setConfirmReset(false)}>

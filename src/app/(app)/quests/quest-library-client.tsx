@@ -1,10 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { SearchX } from "lucide-react";
 import type { Database } from "@/types/database";
 import { QuestCard } from "@/components/app/quest-card";
+import { PageHeader } from "@/components/app/page-header";
 import { CATEGORY_LABEL } from "@/components/app/icon";
-import { cn } from "@/lib/utils";
+import { Chip } from "@/components/ui/chip";
+import { EmptyState } from "@/components/ui/empty-state";
 
 type Activity = Database["public"]["Tables"]["activities"]["Row"];
 type Difficulty = Activity["difficulty"];
@@ -73,12 +76,10 @@ export function QuestLibraryClient({ activities }: { activities: Activity[] }) {
 
   return (
     <div className="flex flex-col gap-5">
-      <header>
-        <h1 className="text-2xl font-extrabold tracking-tight">Quest library</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Browse short, equipment-free quests and start whenever you have a moment.
-        </p>
-      </header>
+      <PageHeader
+        title="Quest library"
+        description="Browse short, equipment-free quests and start whenever you have a moment."
+      />
 
       <div className="flex flex-col gap-3">
         <FilterRow label="Duration">
@@ -125,10 +126,11 @@ export function QuestLibraryClient({ activities }: { activities: Activity[] }) {
           ))}
         </div>
       ) : (
-        <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-          No quests match these filters yet. Try widening your choices — every option here is
-          achievable.
-        </div>
+        <EmptyState
+          icon={SearchX}
+          title="No quests match these filters"
+          description="Try widening your choices — every option here is achievable."
+        />
       )}
     </div>
   );
@@ -142,31 +144,5 @@ function FilterRow({ label, children }: { label: string; children: React.ReactNo
       </p>
       <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">{children}</div>
     </div>
-  );
-}
-
-function Chip({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={cn(
-        "shrink-0 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors",
-        active
-          ? "border-primary bg-primary text-primary-foreground"
-          : "border-border bg-surface text-muted-foreground hover:text-foreground",
-      )}
-    >
-      {children}
-    </button>
   );
 }

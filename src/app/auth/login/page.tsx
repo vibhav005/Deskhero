@@ -7,6 +7,7 @@ import { LogIn, Mail } from "lucide-react";
 import { signIn, signInWithMagicLink, type ActionResult } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Field } from "@/components/ui/field";
 
 const initialState: ActionResult = { ok: true };
 
@@ -18,7 +19,7 @@ export default function LoginPage() {
   return (
     <div className="flex flex-col gap-5">
       <div>
-        <h1 className="text-2xl font-extrabold tracking-tight">Welcome back</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight">Welcome back</h1>
         <p className="mt-1 text-sm text-muted-foreground">Sign in to pick up where you left off.</p>
       </div>
 
@@ -74,15 +75,3 @@ export default function LoginPage() {
   );
 }
 
-function Field(props: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) {
-  const { label, ...rest } = props;
-  return (
-    <label className="flex flex-col gap-1.5 text-sm font-medium">
-      {label}
-      <input
-        {...rest}
-        className="rounded-xl border border-border bg-surface px-3.5 py-2.5 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      />
-    </label>
-  );
-}
