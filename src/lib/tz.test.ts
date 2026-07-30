@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { todayInTimezone, currentHourInTimezone } from "./tz";
+import { todayInTimezone, currentHourInTimezone, isoDayOfWeek, currentWeekStartInTimezone } from "./tz";
 
 describe("tz", () => {
   beforeEach(() => {
@@ -32,5 +32,17 @@ describe("tz", () => {
 
   it("falls back to UTC hour for an invalid timezone instead of throwing", () => {
     expect(currentHourInTimezone("Not/A_Real_Zone")).toBe(23);
+  });
+
+  it("computes ISO day-of-week (0=Monday..6=Sunday) correctly", () => {
+    expect(isoDayOfWeek("2026-01-12")).toBe(0); // Monday
+    expect(isoDayOfWeek("2026-01-15")).toBe(3); // Thursday
+    expect(isoDayOfWeek("2026-01-18")).toBe(6); // Sunday
+  });
+
+  it("computes the current week's Monday per timezone", () => {
+    // 2026-01-15 (Etc/GMT+12) and 2026-01-16 (Pacific/Kiritimati) are both in the same ISO week.
+    expect(currentWeekStartInTimezone("Etc/GMT+12")).toBe("2026-01-12");
+    expect(currentWeekStartInTimezone("Pacific/Kiritimati")).toBe("2026-01-12");
   });
 });

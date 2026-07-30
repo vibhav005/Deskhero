@@ -11,6 +11,7 @@ import {
   type UserContext,
 } from "@/lib/quest-engine";
 import { buildExplanations } from "@/lib/recommendation-explain";
+import { getTodayDayType } from "@/lib/queries/weekly-plan";
 import {
   completeQuestSchema,
   dailyQuestIdSchema,
@@ -219,13 +220,26 @@ export async function generateDailyPlan(
     await loadHistorySignals(supabase, user.id);
   const todaysCheckIn = await loadTodayCheckIn(supabase, user.id, planDate);
   const lowEnergyToday = (todaysCheckIn?.energy_level ?? 5) <= 2;
-  const allowChallenging = hasRecentHistory && twoWeekConsistency >= 0.8 && !lowEnergyToday;
+  const todayDayType = await getTodayDayType(user.id, ctx.timezone);
+  // A weekly plan sets a default intention for the day, but a real-time
+  // check-in always wins over it — never force a "workout" day when the user
+  // has just reported low energy.
+  const weeklyPlanForcesEasy =
+    todayDayType === "recovery" || todayDayType === "rest" || todayDayType === "light";
+  const weeklyPlanAllowsChallenge = todayDayType === "workout" && !lowEnergyToday;
+  const weeklyPlanReducesCount = todayDayType === "work_heavy";
+
   const strugglingConsistency = hasRecentHistory && weeklyConsistency < 0.4;
-  const forceEasyOnly = strugglingConsistency || lowEnergyToday || Boolean(options.easier);
+  const forceEasyOnly =
+    strugglingConsistency || lowEnergyToday || weeklyPlanForcesEasy || Boolean(options.easier);
+  const allowChallenging =
+    !forceEasyOnly &&
+    ((hasRecentHistory && twoWeekConsistency >= 0.8 && !lowEnergyToday) || weeklyPlanAllowsChallenge);
 
   let count = COUNT_BY_ACTIVITY_LEVEL[ctx.activityLevel] ?? 4;
   if (strugglingConsistency && !options.easier) count = Math.max(3, count - 1);
   if (options.easier) count = Math.max(3, count - 1);
+  if (weeklyPlanReducesCount) count = Math.max(3, count - 1);
 
   if (options.easier && existingPlan) {
     const existingQuests = existingPlan.daily_quests ?? [];

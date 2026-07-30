@@ -28,3 +28,19 @@ export function currentHourInTimezone(timezone: string): number {
     return new Date().getUTCHours();
   }
 }
+
+/** ISO day-of-week index for a YYYY-MM-DD date string: 0=Monday .. 6=Sunday. */
+export function isoDayOfWeek(dateStr: string): number {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d));
+  return (date.getUTCDay() + 6) % 7;
+}
+
+/** The Monday (ISO week start) of the current week, in a given IANA timezone — used as weekly_plans.week_start_date. */
+export function currentWeekStartInTimezone(timezone: string): string {
+  const todayStr = todayInTimezone(timezone);
+  const [y, m, d] = todayStr.split("-").map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d));
+  date.setUTCDate(date.getUTCDate() - isoDayOfWeek(todayStr));
+  return date.toISOString().slice(0, 10);
+}
