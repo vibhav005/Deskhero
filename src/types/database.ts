@@ -203,6 +203,30 @@ export type Database = {
           },
         ]
       }
+      analytics_event_types: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          is_active: boolean
+          name: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          is_active?: boolean
+          name: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          is_active?: boolean
+          name?: string
+        }
+        Relationships: []
+      }
       analytics_events: {
         Row: {
           created_at: string
@@ -232,6 +256,13 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "analytics_events_event_name_fkey"
+            columns: ["event_name"]
+            isOneToOne: false
+            referencedRelation: "analytics_event_types"
+            referencedColumns: ["name"]
+          },
           {
             foreignKeyName: "analytics_events_user_id_fkey"
             columns: ["user_id"]
@@ -431,6 +462,47 @@ export type Database = {
           {
             foreignKeyName: "challenges_owner_id_fkey"
             columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      daily_check_ins: {
+        Row: {
+          check_in_date: string
+          created_at: string
+          energy_level: number
+          id: string
+          mood: string | null
+          notes: string | null
+          soreness_level: number | null
+          user_id: string
+        }
+        Insert: {
+          check_in_date: string
+          created_at?: string
+          energy_level: number
+          id?: string
+          mood?: string | null
+          notes?: string | null
+          soreness_level?: number | null
+          user_id: string
+        }
+        Update: {
+          check_in_date?: string
+          created_at?: string
+          energy_level?: number
+          id?: string
+          mood?: string | null
+          notes?: string | null
+          soreness_level?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_check_ins_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -827,6 +899,106 @@ export type Database = {
             columns: ["work_session_id"]
             isOneToOne: true
             referencedRelation: "work_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recommendation_explanations: {
+        Row: {
+          created_at: string
+          detail: string | null
+          factor_key: string
+          headline: string
+          id: string
+          recommendation_score_id: string
+          sequence: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          detail?: string | null
+          factor_key: string
+          headline: string
+          id?: string
+          recommendation_score_id: string
+          sequence?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          detail?: string | null
+          factor_key?: string
+          headline?: string
+          id?: string
+          recommendation_score_id?: string
+          sequence?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recommendation_explanations_recommendation_score_id_fkey"
+            columns: ["recommendation_score_id"]
+            isOneToOne: false
+            referencedRelation: "recommendation_scores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recommendation_explanations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recommendation_scores: {
+        Row: {
+          activity_id: string
+          created_at: string
+          daily_quest_id: string
+          factors: Json
+          id: string
+          total_score: number
+          user_id: string
+        }
+        Insert: {
+          activity_id: string
+          created_at?: string
+          daily_quest_id: string
+          factors?: Json
+          id?: string
+          total_score: number
+          user_id: string
+        }
+        Update: {
+          activity_id?: string
+          created_at?: string
+          daily_quest_id?: string
+          factors?: Json
+          id?: string
+          total_score?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recommendation_scores_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recommendation_scores_daily_quest_id_fkey"
+            columns: ["daily_quest_id"]
+            isOneToOne: true
+            referencedRelation: "daily_quests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recommendation_scores_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

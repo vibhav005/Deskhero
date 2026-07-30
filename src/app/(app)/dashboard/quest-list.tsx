@@ -4,7 +4,7 @@ import { useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Check } from "lucide-react";
+import { Check, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { categoryIcon, CATEGORY_LABEL } from "@/components/app/icon";
 import { completeQuest } from "@/lib/actions/quests";
@@ -68,6 +68,12 @@ export function QuestList({ quests }: { quests: DashboardQuest[] }) {
                   {CATEGORY_LABEL[quest.activity.category as never]} · {quest.activity.minutes} min ·{" "}
                   {quest.activity.xp_value} XP
                 </span>
+                {quest.topReason && !isDone && (
+                  <span className="mt-0.5 flex items-center gap-1 text-xs text-primary">
+                    <Sparkles className="h-3 w-3 shrink-0" aria-hidden />
+                    {quest.topReason}
+                  </span>
+                )}
               </span>
             </Link>
             {isDone ? (

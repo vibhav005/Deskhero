@@ -9,7 +9,7 @@ export const COUNT_BY_ACTIVITY_LEVEL: Record<string, number> = {
   moderate: 5,
 };
 
-const GOAL_PRIORITY: Record<string, string[]> = {
+export const GOAL_PRIORITY: Record<string, string[]> = {
   energy: ["walking", "mobility", "hydration", "breathing"],
   posture: ["posture", "mobility", "eye-care", "breathing"],
   strength: ["strength", "mobility", "posture", "walking"],
@@ -18,7 +18,7 @@ const GOAL_PRIORITY: Record<string, string[]> = {
   general: ["hydration", "posture", "walking", "mobility"],
 };
 
-const PREF_BOOST: Record<string, string[]> = {
+export const PREF_BOOST: Record<string, string[]> = {
   walking: ["walking"],
   stretching: ["mobility", "posture"],
   strength: ["strength"],
@@ -26,7 +26,7 @@ const PREF_BOOST: Record<string, string[]> = {
   mixed: [],
 };
 
-const INACTIVE_FOCUS = ["walking", "mobility", "hydration", "posture"];
+export const INACTIVE_FOCUS = ["walking", "mobility", "hydration", "posture"];
 
 const TIME_OF_DAY_CATEGORIES: { start: number; end: number; categories: string[] }[] = [
   { start: 5, end: 11, categories: ["breathing", "hydration"] },
@@ -54,12 +54,32 @@ export interface SelectionParams extends UserContext {
   excludeCategories?: Set<string>;
 }
 
+/** Named components of a candidate's score — persisted so recommendations stay explainable. */
+export interface ScoreFactors {
+  category_priority: number;
+  difficulty_ease: number;
+  hydration_boost: number;
+  time_of_day: number;
+  skip_penalty: number;
+}
+
+export interface ScoredActivity {
+  activity: Activity;
+  totalScore: number;
+  factors: ScoreFactors;
+}
+
 /**
  * Score + greedily select activities. Shared by initial daily-plan
  * generation, "make today easier," and single-quest replace — the same
  * scoring rules apply to a brand-new plan or a one-off swap.
+ *
+ * Returns the chosen activities together with the exact factor breakdown
+ * that produced their score, so callers can persist a faithful "why this was
+ * recommended" record instead of recomputing (and potentially drifting from)
+ * the explanation later.
  */
-export function selectActivities(params: SelectionParams): Activity[] {
+export function selectActivities(params: SelectionParams): ScoredActivity[] {
   const {
     activities,
     activityLevel,
@@ -107,48 +127,59 @@ export function selectActivities(params: SelectionParams): Activity[] {
   });
   if (pool.length === 0) pool = activities.filter((a) => a.minutes <= maxPerQuestMinutes);
 
-  const scored = pool
+  const scored: ScoredActivity[] = pool
     .map((activity) => {
-      let score = 0;
       const idx = priorityList.indexOf(activity.category);
-      if (idx !== -1) score += (priorityList.length - idx) * 10;
-      if (activity.difficulty === "easy") score += 3;
-      if (activity.category === "hydration") score += 4;
-      if (timeCategories.includes(activity.category)) score += 5;
+      const factors: ScoreFactors = {
+        category_priority: idx !== -1 ? (priorityList.length - idx) * 10 : 0,
+        difficulty_ease: activity.difficulty === "easy" ? 3 : 0,
+        hydration_boost: activity.category === "hydration" ? 4 : 0,
+        time_of_day: timeCategories.includes(activity.category) ? 5 : 0,
+        skip_penalty: 0,
+      };
       const skips = skipCounts.get(activity.id);
-      if (skips) score -= skips.within7 * 8 + skips.within14 * 3;
-      return { activity, score };
+      if (skips) factors.skip_penalty = -(skips.within7 * 8 + skips.within14 * 3);
+      const totalScore =
+        factors.category_priority +
+        factors.difficulty_ease +
+        factors.hydration_boost +
+        factors.time_of_day +
+        factors.skip_penalty;
+      return { activity, totalScore, factors };
     })
-    .sort((a, b) => b.score - a.score);
+    .sort((a, b) => b.totalScore - a.totalScore);
 
-  const chosen: Activity[] = [];
+  const chosen: ScoredActivity[] = [];
   const usedCategories = new Set<string>(excludeCategories ?? []);
   let totalMinutes = 0;
 
-  for (const { activity } of scored) {
+  for (const entry of scored) {
     if (chosen.length >= count) break;
-    if (usedCategories.has(activity.category)) continue;
-    if (chosen.length > 0 && totalMinutes + activity.minutes > maxPlanMinutes) continue;
-    chosen.push(activity);
-    usedCategories.add(activity.category);
-    totalMinutes += activity.minutes;
+    if (usedCategories.has(entry.activity.category)) continue;
+    if (chosen.length > 0 && totalMinutes + entry.activity.minutes > maxPlanMinutes) continue;
+    chosen.push(entry);
+    usedCategories.add(entry.activity.category);
+    totalMinutes += entry.activity.minutes;
   }
-  for (const { activity } of scored) {
+  for (const entry of scored) {
     if (chosen.length >= count) break;
-    if (chosen.some((c) => c.id === activity.id)) continue;
-    if (chosen.length > 0 && totalMinutes + activity.minutes > maxPlanMinutes) continue;
-    chosen.push(activity);
-    totalMinutes += activity.minutes;
+    if (chosen.some((c) => c.activity.id === entry.activity.id)) continue;
+    if (chosen.length > 0 && totalMinutes + entry.activity.minutes > maxPlanMinutes) continue;
+    chosen.push(entry);
+    totalMinutes += entry.activity.minutes;
   }
 
   // Guarantee at least one very-easy quest in a fresh plan (not applicable to single-quest replace).
   if (count > 1) {
-    const hasVeryEasy = chosen.some((a) => a.difficulty === "easy" && a.minutes <= 2);
+    const hasVeryEasy = chosen.some((c) => c.activity.difficulty === "easy" && c.activity.minutes <= 2);
     if (!hasVeryEasy) {
       const veryEasy = scored.find(
-        ({ activity }) => activity.difficulty === "easy" && activity.minutes <= 2 && !chosen.some((c) => c.id === activity.id),
+        (entry) =>
+          entry.activity.difficulty === "easy" &&
+          entry.activity.minutes <= 2 &&
+          !chosen.some((c) => c.activity.id === entry.activity.id),
       );
-      if (veryEasy && chosen.length > 0) chosen[chosen.length - 1] = veryEasy.activity;
+      if (veryEasy && chosen.length > 0) chosen[chosen.length - 1] = veryEasy;
     }
   }
 
