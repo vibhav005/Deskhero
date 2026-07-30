@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Award, CalendarCheck, ChevronRight, Flame, Play, Sparkles, Users } from "lucide-react";
 import { getDashboardData } from "@/lib/queries/dashboard";
 import { generateDailyPlan } from "@/lib/actions/quests";
+import { getTodayCheckIn } from "@/lib/actions/check-ins";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -12,6 +13,7 @@ import { AnimatedCounter } from "@/components/app/animated-counter";
 import { PixelHero } from "@/components/app/pixel-hero";
 import { cn } from "@/lib/utils";
 import { QuestList } from "./quest-list";
+import { CheckInCard } from "./check-in-card";
 
 export default async function DashboardPage() {
   let data = await getDashboardData();
@@ -20,6 +22,8 @@ export default async function DashboardPage() {
     data = await getDashboardData();
   }
   if (!data) return null;
+
+  const todaysCheckIn = await getTodayCheckIn();
 
   const {
     displayName,
@@ -109,6 +113,8 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
+
+      <CheckInCard initialEnergyLevel={todaysCheckIn?.energy_level ?? null} />
 
       <section aria-labelledby="today-heading">
         <div className="mb-3 flex items-center justify-between">
