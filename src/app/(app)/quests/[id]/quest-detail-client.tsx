@@ -6,6 +6,7 @@ import { useState, useTransition } from "react";
 import {
   ArrowLeft,
   Check,
+  ChevronDown,
   Clock,
   Dumbbell,
   Info,
@@ -15,6 +16,7 @@ import {
   Shuffle,
   ShieldAlert,
   SkipForward,
+  Sparkles,
   Zap,
 } from "lucide-react";
 import { useTimer } from "@/hooks/use-timer";
@@ -35,9 +37,10 @@ const DIFFICULTY_LABEL = {
 } as const;
 
 export function QuestDetailClient({ detail }: { detail: ActivityDetail }) {
-  const { activity, dailyQuestId, status } = detail;
+  const { activity, dailyQuestId, status, recommendation } = detail;
   const router = useRouter();
   const [showEasier, setShowEasier] = useState(false);
+  const [showWhyRecommended, setShowWhyRecommended] = useState(false);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -112,6 +115,37 @@ export function QuestDetailClient({ detail }: { detail: ActivityDetail }) {
           <Zap className="h-3 w-3" aria-hidden /> {activity.xp_value} XP
         </Badge>
       </div>
+
+      {recommendation && recommendation.explanations.length > 0 && (
+        <Card className="p-4">
+          <button
+            onClick={() => setShowWhyRecommended((v) => !v)}
+            aria-expanded={showWhyRecommended}
+            className="flex w-full items-center justify-between gap-2 text-left"
+          >
+            <span className="inline-flex items-center gap-2 font-semibold">
+              <Sparkles className="h-5 w-5 text-primary" aria-hidden />
+              Why this was recommended
+            </span>
+            <ChevronDown
+              className={cn("h-4 w-4 text-muted-foreground transition-transform", showWhyRecommended && "rotate-180")}
+              aria-hidden
+            />
+          </button>
+          {showWhyRecommended && (
+            <ul className="mt-3 flex flex-col gap-2">
+              {recommendation.explanations.map((e) => (
+                <li key={e.sequence} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <Badge variant="muted" className="mt-0.5 shrink-0">
+                    {e.factorKey.replace(/_/g, " ")}
+                  </Badge>
+                  <span>{e.headline}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
+      )}
 
       {alreadyDone && (
         <Callout icon={Check} tone="success">

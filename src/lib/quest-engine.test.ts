@@ -68,7 +68,7 @@ describe("selectActivities", () => {
       count: 2,
       limitationTags: ["knee"],
     });
-    expect(result.map((a) => a.id)).not.toContain("risky");
+    expect(result.map((r) => r.activity.id)).not.toContain("risky");
   });
 
   it("only returns easy activities when forceEasyOnly is set", () => {
@@ -83,7 +83,7 @@ describe("selectActivities", () => {
       count: 3,
       forceEasyOnly: true,
     });
-    expect(result.every((a) => a.difficulty === "easy")).toBe(true);
+    expect(result.every((r) => r.activity.difficulty === "easy")).toBe(true);
   });
 
   it("excludes challenging activities when allowChallenging is false", () => {
@@ -97,7 +97,7 @@ describe("selectActivities", () => {
       count: 2,
       allowChallenging: false,
     });
-    expect(result.map((a) => a.id)).not.toContain("c1");
+    expect(result.map((r) => r.activity.id)).not.toContain("c1");
   });
 
   it("includes challenging activities when allowChallenging is true", () => {
@@ -108,7 +108,7 @@ describe("selectActivities", () => {
       count: 1,
       allowChallenging: true,
     });
-    expect(result.map((a) => a.id)).toContain("c1");
+    expect(result.map((r) => r.activity.id)).toContain("c1");
   });
 
   it("respects excludeActivityIds and excludeCategories (used by single-quest replace)", () => {
@@ -125,7 +125,7 @@ describe("selectActivities", () => {
       excludeCategories: new Set(["walking"]),
     });
     expect(result).toHaveLength(1);
-    expect(result[0].id).toBe("fresh");
+    expect(result[0].activity.id).toBe("fresh");
   });
 
   it("guarantees at least one very-easy quest in a multi-quest plan when one is available", () => {
@@ -136,7 +136,7 @@ describe("selectActivities", () => {
       makeActivity({ id: "tiny", category: "sleep", difficulty: "easy", minutes: 1 }),
     ];
     const result = selectActivities({ ...baseParams, activities, count: 2 });
-    expect(result.some((a) => a.difficulty === "easy" && a.minutes <= 2)).toBe(true);
+    expect(result.some((r) => r.activity.difficulty === "easy" && r.activity.minutes <= 2)).toBe(true);
   });
 
   it("does not pick two activities from the same category when alternatives exist", () => {
@@ -146,7 +146,15 @@ describe("selectActivities", () => {
       makeActivity({ id: "posture1", category: "posture" }),
     ];
     const result = selectActivities({ ...baseParams, activities, count: 2 });
-    const categories = result.map((a) => a.category);
+    const categories = result.map((r) => r.activity.category);
     expect(new Set(categories).size).toBe(categories.length);
+  });
+
+  it("reports a factor breakdown whose sum equals the total score", () => {
+    const activities = [makeActivity({ id: "a1", category: "hydration", difficulty: "easy" })];
+    const result = selectActivities({ ...baseParams, activities, count: 1 });
+    const { totalScore, factors } = result[0];
+    const sum = Object.values(factors).reduce((acc, v) => acc + v, 0);
+    expect(sum).toBe(totalScore);
   });
 });

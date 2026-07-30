@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { todayInTimezone } from "@/lib/tz";
+import { getRecommendationExplanation, type RecommendationInfo } from "@/lib/queries/recommendations";
 
 export async function getActivities() {
   const supabase = await createClient();
@@ -15,6 +16,7 @@ export interface ActivityDetail {
   activity: NonNullable<Awaited<ReturnType<typeof getActivityBySlug>>>;
   dailyQuestId: string | null;
   status: "assigned" | "completed" | "skipped" | null;
+  recommendation: RecommendationInfo | null;
 }
 
 export async function getActivityBySlug(slug: string) {
@@ -37,7 +39,7 @@ export async function getActivityDetail(slug: string): Promise<ActivityDetail | 
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { activity, dailyQuestId: null, status: null };
+  if (!user) return { activity, dailyQuestId: null, status: null, recommendation: null };
 
   const { data: profile } = await supabase.from("profiles").select("timezone").eq("id", user.id).single();
   const planDate = todayInTimezone(profile?.timezone ?? "UTC");
@@ -49,7 +51,7 @@ export async function getActivityDetail(slug: string): Promise<ActivityDetail | 
     .eq("plan_date", planDate)
     .maybeSingle();
 
-  if (!plan) return { activity, dailyQuestId: null, status: null };
+  if (!plan) return { activity, dailyQuestId: null, status: null, recommendation: null };
 
   const { data: dailyQuest } = await supabase
     .from("daily_quests")
@@ -58,10 +60,13 @@ export async function getActivityDetail(slug: string): Promise<ActivityDetail | 
     .eq("activity_id", activity.id)
     .maybeSingle();
 
+  const recommendation = dailyQuest ? await getRecommendationExplanation(dailyQuest.id) : null;
+
   return {
     activity,
     dailyQuestId: dailyQuest?.id ?? null,
     status: (dailyQuest?.status as ActivityDetail["status"]) ?? null,
+    recommendation,
   };
 }
 

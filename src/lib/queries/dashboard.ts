@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { todayInTimezone } from "@/lib/tz";
 import { levelForXp, dailyScore } from "@/lib/logic";
+import { getTopReasonsByDailyQuestIds } from "@/lib/queries/recommendations";
 import type { Database } from "@/types/database";
 
 type Activity = Database["public"]["Tables"]["activities"]["Row"];
@@ -9,6 +10,8 @@ export interface DashboardQuest {
   dailyQuestId: string;
   status: "assigned" | "completed" | "skipped";
   activity: Activity;
+  /** Short "why this was recommended" caption, when a stored explanation exists. */
+  topReason?: string;
 }
 
 export interface DashboardData {
@@ -45,14 +48,17 @@ export async function getDashboardData(): Promise<DashboardData | null> {
     .eq("plan_date", planDate)
     .maybeSingle();
 
-  const quests: DashboardQuest[] = (plan?.daily_quests ?? [])
+  const assignedQuests = (plan?.daily_quests ?? [])
     .filter((q) => q.status !== "skipped")
-    .sort((a, b) => a.position - b.position)
-    .map((q) => ({
-      dailyQuestId: q.id,
-      status: q.status as DashboardQuest["status"],
-      activity: q.activities as unknown as Activity,
-    }));
+    .sort((a, b) => a.position - b.position);
+  const topReasons = await getTopReasonsByDailyQuestIds(assignedQuests.map((q) => q.id));
+
+  const quests: DashboardQuest[] = assignedQuests.map((q) => ({
+    dailyQuestId: q.id,
+    status: q.status as DashboardQuest["status"],
+    activity: q.activities as unknown as Activity,
+    topReason: topReasons.get(q.id),
+  }));
 
   const doneCount = quests.filter((q) => q.status === "completed").length;
   const score = dailyScore(doneCount, quests.length);

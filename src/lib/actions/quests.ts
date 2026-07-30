@@ -4,7 +4,13 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { trackEvent } from "@/lib/actions/analytics";
 import { todayInTimezone } from "@/lib/tz";
-import { COUNT_BY_ACTIVITY_LEVEL, selectActivities, type UserContext } from "@/lib/quest-engine";
+import {
+  COUNT_BY_ACTIVITY_LEVEL,
+  selectActivities,
+  type ScoredActivity,
+  type UserContext,
+} from "@/lib/quest-engine";
+import { buildExplanations } from "@/lib/recommendation-explain";
 import {
   completeQuestSchema,
   dailyQuestIdSchema,
@@ -103,6 +109,78 @@ async function loadHistorySignals(
 }
 
 /**
+ * Persists the exact factor breakdown that produced a recommendation, plus
+ * deterministic explanation lines derived from it — best-effort, mirroring
+ * trackEvent's "never break the caller" swallow-errors convention, since this
+ * is an explanatory record, not reward logic.
+ */
+async function persistRecommendation(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  params: {
+    dailyQuestId: string;
+    userId: string;
+    scored: ScoredActivity;
+    context: Pick<UserContext, "goal" | "activityPreference" | "activityLevel">;
+  },
+): Promise<void> {
+  const { dailyQuestId, userId, scored, context } = params;
+  try {
+    const { data: scoreRow } = await supabase
+      .from("recommendation_scores")
+      .upsert(
+        {
+          daily_quest_id: dailyQuestId,
+          user_id: userId,
+          activity_id: scored.activity.id,
+          total_score: scored.totalScore,
+          factors: { ...scored.factors } as unknown as Record<string, number>,
+        },
+        { onConflict: "daily_quest_id" },
+      )
+      .select()
+      .single();
+    if (!scoreRow) return;
+
+    await supabase.from("recommendation_explanations").delete().eq("recommendation_score_id", scoreRow.id);
+
+    const explanations = buildExplanations(scored.factors, {
+      category: scored.activity.category,
+      goal: context.goal,
+      activityPreference: context.activityPreference,
+      activityLevel: context.activityLevel,
+    });
+    const rows = explanations.map((e) => ({
+      recommendation_score_id: scoreRow.id,
+      user_id: userId,
+      headline: e.headline,
+      detail: e.detail,
+      factor_key: e.factorKey,
+      sequence: e.sequence,
+    }));
+    if (rows.length > 0) {
+      await supabase.from("recommendation_explanations").insert(rows);
+    }
+  } catch {
+    // Best-effort — a failure here must never block plan generation/completion.
+  }
+}
+
+/** Today's check-in, if the user submitted one — used to let low energy force an easier plan. */
+async function loadTodayCheckIn(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  planDate: string,
+) {
+  const { data } = await supabase
+    .from("daily_check_ins")
+    .select("energy_level")
+    .eq("user_id", userId)
+    .eq("check_in_date", planDate)
+    .maybeSingle();
+  return data;
+}
+
+/**
  * Generates (or, with `easier: true`, regenerates the still-uncompleted
  * portion of) today's plan. Idempotent: a plan already exists for
  * (user, plan_date) is left untouched unless `easier` is set.
@@ -139,9 +217,11 @@ export async function generateDailyPlan(
 
   const { skipCounts, weeklyConsistency, twoWeekConsistency, hasRecentHistory } =
     await loadHistorySignals(supabase, user.id);
-  const allowChallenging = hasRecentHistory && twoWeekConsistency >= 0.8;
+  const todaysCheckIn = await loadTodayCheckIn(supabase, user.id, planDate);
+  const lowEnergyToday = (todaysCheckIn?.energy_level ?? 5) <= 2;
+  const allowChallenging = hasRecentHistory && twoWeekConsistency >= 0.8 && !lowEnergyToday;
   const strugglingConsistency = hasRecentHistory && weeklyConsistency < 0.4;
-  const forceEasyOnly = strugglingConsistency || Boolean(options.easier);
+  const forceEasyOnly = strugglingConsistency || lowEnergyToday || Boolean(options.easier);
 
   let count = COUNT_BY_ACTIVITY_LEVEL[ctx.activityLevel] ?? 4;
   if (strugglingConsistency && !options.easier) count = Math.max(3, count - 1);
@@ -176,16 +256,27 @@ export async function generateDailyPlan(
       .eq("status", "assigned");
 
     const startPosition = existingQuests.filter((q) => q.status === "completed").length;
-    const rows = chosen.map((a, i) => ({
+    const rows = chosen.map((c, i) => ({
       daily_plan_id: existingPlan.id,
       user_id: user.id,
-      activity_id: a.id,
+      activity_id: c.activity.id,
       position: startPosition + i,
       assigned_reason: "easier",
     }));
     if (rows.length > 0) {
-      const { error } = await supabase.from("daily_quests").insert(rows);
+      const { data: insertedQuests, error } = await supabase.from("daily_quests").insert(rows).select();
       if (error) return { ok: false, message: error.message };
+      for (const quest of insertedQuests ?? []) {
+        const match = chosen.find((c) => c.activity.id === quest.activity_id);
+        if (match) {
+          await persistRecommendation(supabase, {
+            dailyQuestId: quest.id,
+            userId: user.id,
+            scored: match,
+            context: ctx,
+          });
+        }
+      }
     }
     await supabase
       .from("daily_plans")
@@ -222,15 +313,27 @@ export async function generateDailyPlan(
     return { ok: false, message: planError?.message ?? "Could not create today's plan." };
   }
 
-  const rows = chosen.map((a, i) => ({
+  const rows = chosen.map((c, i) => ({
     daily_plan_id: newPlan.id,
     user_id: user.id,
-    activity_id: a.id,
+    activity_id: c.activity.id,
     position: i,
     assigned_reason: forceEasyOnly ? "recovery" : "standard",
   }));
-  const { error: questsError } = await supabase.from("daily_quests").insert(rows);
+  const { data: insertedQuests, error: questsError } = await supabase.from("daily_quests").insert(rows).select();
   if (questsError) return { ok: false, message: questsError.message };
+
+  for (const quest of insertedQuests ?? []) {
+    const match = chosen.find((c) => c.activity.id === quest.activity_id);
+    if (match) {
+      await persistRecommendation(supabase, {
+        dailyQuestId: quest.id,
+        userId: user.id,
+        scored: match,
+        context: ctx,
+      });
+    }
+  }
 
   revalidatePath("/dashboard");
   await trackEvent(options.easier ? "make_today_easier_used" : "daily_plan_generated");
@@ -346,9 +449,16 @@ export async function replaceQuest(input: DailyQuestIdInput): Promise<ActionResu
 
   const { error } = await supabase
     .from("daily_quests")
-    .update({ activity_id: replacement.id, assigned_reason: "replaced" })
+    .update({ activity_id: replacement.activity.id, assigned_reason: "replaced" })
     .eq("id", parsed.data.dailyQuestId);
   if (error) return { ok: false, message: error.message };
+
+  await persistRecommendation(supabase, {
+    dailyQuestId: parsed.data.dailyQuestId,
+    userId: user.id,
+    scored: replacement,
+    context: ctx,
+  });
 
   revalidatePath("/dashboard");
   await trackEvent("quest_replaced", { dailyQuestId: parsed.data.dailyQuestId });
