@@ -1,5 +1,6 @@
 import {
   Award,
+  CalendarRange,
   Dumbbell,
   Home,
   LineChart,
@@ -24,6 +25,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/progress", label: "Progress", icon: LineChart, primary: true },
   { href: "/achievements", label: "Badges", icon: Award, primary: false },
   { href: "/challenges", label: "Challenges", icon: Users, primary: false },
+  { href: "/weekly-plan", label: "Weekly Plan", icon: CalendarRange, primary: false },
   { href: "/profile", label: "Profile", icon: User, primary: true },
 ];
 
